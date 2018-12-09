@@ -228,7 +228,7 @@ def importShotAlembics(*args):
 
 def importShaders(*args):
 	import glob
-	#Lister tout les alembics dans le dossier abc du shot
+	# Lister tout les alembics dans le dossier abc du shot
 	availableAlembics = []
 	currentShot = cmds.workspace(q=True,rd=True)
 	abcPath = os.path.join(currentShot,'abc')
@@ -237,17 +237,16 @@ def importShaders(*args):
 	for i in abcList:
 		asset = i.replace('.abc','')
 		availableAlembics.append(asset)
-	#Virer de la liste la camera du shot
+	# Virer de la liste la camera du shot
 	currentShot = os.path.basename(os.path.normpath(cmds.workspace(q=True,rd=True)))
 	shotCamera = currentShot
 	if shotCamera in availableAlembics: availableAlembics.remove(shotCamera)
-	#virer le nom du shot dans le nom des alembics
-
-	#Separer shaders deja importes de ceux disponibles
+	# Virer le nom du shot dans le nom des alembics
+	# Separer shaders deja importes de ceux disponibles
 	dontImport = []
 	toImport = []
 	for i in availableAlembics :
-		#On vire le nom du shot present devant le nom des alembics
+		# On vire le nom du shot present devant le nom des alembics
 		scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 		sceneName = os.path.split(scenePath)
 		completeName = sceneName[1]+'_'
@@ -257,8 +256,7 @@ def importShaders(*args):
 			dontImport.append(i)
 		else :
 			toImport.append(i)
-	# print toImport
-	#Verifier que le fichier de shader existe et est publie
+	# Verifier que le fichier de shader existe et est publie
 	shadersToImport = []
 	for i in toImport:
 		scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
@@ -266,10 +264,10 @@ def importShaders(*args):
 		completeName = sceneName[1]+'_'
 		i = i.replace(completeName,'')
 		i = i.replace('_shdRN','')
-		if 'props' in i:
+		if i.startsWith('props') == True:
 			resolvePath = os.path.join(SkidAssets,'props',i,i+'_shd.ma')
 			assetType = 'props'
-		elif 'character' in i:
+		elif i.startsWith('character') == True:
 			resolvePath = os.path.join(SkidAssets,'character',i,i+'_shd.ma')
 			assetType = 'character'
 		else :
@@ -283,7 +281,7 @@ def importShaders(*args):
 			cmds.warning('Path does not exist for '+i)
 			print resolvePath
 			pass
-	#User prompt pour continuer ou non
+	# User prompt pour continuer ou non
 	lenToImport = len(shadersToImport)
 	if lenToImport == 0:
 		cmds.inViewMessage(amg='No shader to import',pos='midCenter',fade=True)
@@ -297,23 +295,23 @@ def importShaders(*args):
 			pass
 
 def assignShaders(*args):
-	#Dabord on liste les geometries qui ont un ID
+	# Dabord on liste les geometries qui ont un ID
 	geometries = cmds.ls("*_ID*",r=True,tr=True)
-	#On check quon a bien des geometries
+	# On check quon a bien des geometries
 	if not geometries:
 		cmds.warning('Could not find any object with ID, make sure your object names look like : "assetNameSpace:objectName_IDsomething"')
 	else :
-		#user prompt pour continuer
+		# User prompt pour continuer
 		confirm = cmds.confirmDialog(title='Assign Shaders', message='Found '+str(len(geometries))+' object with ID. Continue ?', button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No' )
 		if confirm == 'Yes':
 			for i in geometries:
-				#On split le mot cle de l'ID
+				# On split le mot cle de l'ID
 				ID = i.split('_ID', 1)[-1]
-				#On split le namespace
+				# On split le namespace
 				nameSpace = i.split(':',)[0]
-				# puis on reconstruie le nom du shading group :
+				# Puis on reconstruie le nom du shading group :
 				SG = nameSpace+'_shd:'+ID+'_SG'
-				# puis on assigne le shading group a la geo qui lui correspond
+				# Puis on assigne le shading group a la geo qui lui correspond
 				try :
 					cmds.sets(i,e=True,forceElement=SG)
 				except TypeError :

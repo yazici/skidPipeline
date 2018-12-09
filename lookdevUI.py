@@ -58,7 +58,7 @@ def CreateUI(*args):
 							button(label='Import lookdev scene',w=198,c='import lookdevTools; reload(lookdevTools); lookdevTools.importLookdevScene()')
 							button(label='Hide',w=48,c='import lookdevTools; reload(lookdevTools); lookdevTools.hideLookdevScene()')
 							button(label='Reload',w=49,c='import lookdevTools; reload(lookdevTools); lookdevTools.reloadLookdevScene()')
-						button(l='Load Render Settings',c='import lookdevTools; reload(lookdevTools); lookdevTools.loadRenderSettings("%s")' %lookdevPreset)
+						button(l='Load Render Settings',c='import commonTools; reload(commonTools); commonTools.loadRenderSettings("%s")' %lookdevPreset)
 						# global chosenHDR
 						optionMenu(changeCommand=chooseHDRfile)
 						for file in hdri_files:

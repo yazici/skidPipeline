@@ -10,6 +10,6 @@ def createMenu():
 	cmds.menuItem(parent = SkidToolsMenu, label = "Animation Tools",c='import animationUI; reload(animationUI); animationUI.CreateUI()')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Assets Tools",c='import assetsUI; reload(assetsUI); assetsUI.CreateUI()')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Lookdev Tools",c='import lookdevUI; reload(lookdevUI); lookdevUI.CreateUI()')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools", c='import previzUI; reload(previzUI); previzUI.CreateUI()')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Rendering Tools",en=False)
+	cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools",c='import previzUI; reload(previzUI); previzUI.CreateUI()')
+	cmds.menuItem(parent = SkidToolsMenu, label = "Render Tools",c='import renderUI; reload(renderUI); renderUI.CreateUI()',en=False)
 	cmds.menuItem(parent = SkidToolsMenu, label = "Rigging Tools",en=False)

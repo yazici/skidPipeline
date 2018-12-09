@@ -85,12 +85,12 @@ def showNomenclatures(*args):
 	cmds.setParent("..")
 	cmds.showWindow()
 
-def RfMsubdivScheme(onOff,*args): #argument must be boolean
+def RfMsubdivScheme(onOff,*args): # Argument must be boolean
 	sel = cmds.ls(selection=True)
 	for i in sel:
 		cmds.setAttr(i+'.rman_subdivScheme',onOff)
 
-def areeeeett(*args):
+def areeeeett(*args): # Easter egg
 	import winsound
 	import time
 	import os
@@ -122,3 +122,12 @@ def importAssetMa(asset,*args):
 	
 	resolvePath = os.path.join(assetPath,assetType,asset,asset+'.ma')
 	cmds.file(resolvePath,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=asset)
+
+def loadRenderSettings(context,*args): # Argument must be json file name
+	import maya.app.renderSetup.views.renderSetupPreferences as prefs
+	try :
+		prefs.loadGlobalPreset(context)
+		cmds.inViewMessage(amg='Render settings preset <hl>'+context+'</hl> successfuly loaded.',pos='midCenter',fade=True)
+	except EnvironmentError:
+		commonTools.areeeeett()
+		cmds.warning('File '+context+'.json does not exist')
