@@ -80,15 +80,6 @@ def delete_turn_loc(*arg):
 def open_hdri_folder(*arg):
 	os.startfile(hdri_folder)
 
-def loadRenderSettings(context,*args): #argument must be json file name
-	import maya.app.renderSetup.views.renderSetupPreferences as prefs
-	try :
-		prefs.loadGlobalPreset(context) #surement a remplacer par global
-		cmds.inViewMessage(amg='Render settings preset <hl>'+context+'</hl> successfuly loaded.',pos='midCenter',fade=True)
-	except EnvironmentError:
-		commonTools.areeeeett()
-		cmds.warning('Context '+context+' does not exist. Qui a delete ce putain de fichier json !?.')
-
 def turnLights(*args):
 	hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
 	if cmds.objExists(hdriTurnGrp) == False:
