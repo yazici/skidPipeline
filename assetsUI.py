@@ -40,7 +40,7 @@ def CreateUI(*args):
 	with window(assetsWindow, title='Assets Tools',menuBar=True,menuBarVisible=True) as win:
 		with template:
 			with columnLayout():
-				with frameLayout('Prepare geomtries'):
+				with frameLayout('Prepare geometries'):
 					with columnLayout():
 						button(label = 'Set Object To Zero',c='import assetsTools; reload(assetsTools); assetsTools.setObject()')
 						button(label = 'Fix Normals',c='import assetsTools; reload(assetsTools); assetsTools.fixNormals()')
