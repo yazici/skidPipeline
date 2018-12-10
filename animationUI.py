@@ -49,10 +49,10 @@ def CreateUI(*args):
 
 				with frameLayout('Animation Tools'):
 					with columnLayout():
-						button(l='Open bhGhost',c='mel.eval(\'source "%s/bhGhost.mel"\')' %animScriptsPath)
-						button(l='Open TweenMachine',c='mel.eval(\'source "%s/tweenMachine.mel"\')' %animScriptsPath)
-						button(l='Open dkAnim',c='mel.eval(\'source "%s/dkAnim-v0.7-.mel"\')' %animScriptsPath)
-						button(l='Open aTools',c='mel.eval(\'source "%s/aTools_install.mel"\')' %animScriptsPath)
+						# button(l='Open bhGhost',c='mel.eval(\'source "%s/bhGhost.mel"\')' %animScriptsPath)
+						# button(l='Open TweenMachine',c='mel.eval(\'source "%s/tweenMachine.mel"\')' %animScriptsPath)
+						button(l='Open dkAnim',c='import maya.mel as mel; mel.eval(\'source "%s/dkAnim-v0.7-.mel"\'); mel.eval(\'dkAnim()\')' %animScriptsPath)
+						button(l='Open arcTracker',c='mel.eval(\'source "%s/arctracker110.mel"\'); mel.eval(\'arctracker110()\')' %animScriptsPath)
 						button(l='Create Speed Attribute',c='import animationTools; reload(animationTools); animationTools.createSpeedAttribute()')
 						button(l='Playblast Animation',c='import animationTools; reload(animationTools); animationTools.playblastAnim()')
 			
