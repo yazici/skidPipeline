@@ -49,10 +49,10 @@ def CreateUI(*args):
 
 				with frameLayout('Animation Plugins'):
 					with columnLayout():
-						button(l='bhGhost',c='mel.eval(\'source "%s/bhGhost.mel"\'); mel.eval(\'bhGhost()\')' %animScriptsPath)
+						button(l='bhGhost',c='import maya.mel as mel; mel.eval(\'source "%s/bhGhost.mel"\'); mel.eval(\'bhGhost()\')' %animScriptsPath)
 						# button(l='Open TweenMachine',c='mel.eval(\'source "%s/tweenMachine.mel"\')' %animScriptsPath)
 						button(l='dkAnim',c='import maya.mel as mel; mel.eval(\'source "%s/dkAnim-v0.7-.mel"\'); mel.eval(\'dkAnim()\')' %animScriptsPath)
-						button(l='arcTracker',c='mel.eval(\'source "%s/arctracker110.mel"\'); mel.eval(\'arctracker110()\')' %animScriptsPath)
+						button(l='arcTracker',c='import maya.mel as mel; mel.eval(\'source "%s/arctracker110.mel"\'); mel.eval(\'arctracker110()\')' %animScriptsPath)
 
 				with frameLayout('Animation Tools'):
 					with columnLayout():
