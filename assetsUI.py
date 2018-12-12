@@ -59,12 +59,14 @@ def CreateUI(*args):
 
 				with frameLayout('Export / Publish Asset'):
 					with columnLayout():
-						with rowLayout(numberOfColumns=3,ad3=2):
-							button(label='Export to Alembic',w=98,c='import assetsTools; reload(assetsTools); assetsTools.exportAbcRfM()')
-							button(label='Export GPU Cache',w=98,c='import assetsTools; reload(assetsTools); assetsTools.exportGPUcache()')
-							button(label='Export RIB Archive',w=99,c='import assetsTools; reload(assetsTools); assetsTools.exportRIBarchive()',en=False)
+						with rowLayout(numberOfColumns=4,ad4=2):
+							button(label='Export .ma',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportMayaAscii()')
+							button(label='Export .abc',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportAbcRfM()')
+							button(label='Export GPU',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportGPUcache()')
+							button(label='Export RIB',w=74,c='import assetsTools; reload(assetsTools); assetsTools.exportRIBarchive()',en=False)
 						button(label='Publish asset',c='import assetsTools; reload(assetsTools); assetsTools.publishAsset()',en=False)
 
 				with frameLayout('Nomenclatures'):
 					with columnLayout():
 						button(label='Nomenclatures',h=30,c='import commonTools; reload(commonTools); commonTools.showNomenclatures()')
+CreateUI()

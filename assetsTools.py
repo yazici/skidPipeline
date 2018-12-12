@@ -70,6 +70,10 @@ def fixShapesNames(*args):
 	for shape in shapes :
 		cmds.rename(shape, "{0}Shape".format(cmds.listRelatives(shape, parent=True)[0]))
 
+def exportMayaAscii(*args):
+	import maya.mel as mel
+	mel.eval('ExportSelection;')
+
 def exportAbcRfM(*args): #Export alembic avec attributes renderman
 	try:
 		import sys
