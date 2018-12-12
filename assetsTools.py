@@ -156,3 +156,11 @@ def renameDuplicates(*args):
         return False
     else:
         return True
+
+def checkAssetStatus(*args):
+	pass
+	# Delete shape origin
+	# Delete all history (sauf pour les riggs)
+	# Mise a zero
+	# Verif(Freeze scales) sauf pour les locators
+	# rename shapes

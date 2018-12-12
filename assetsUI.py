@@ -31,6 +31,7 @@ def CreateUI(*args):
 	template.define(rowColumnLayout,numberOfColumns=2)
 	template.define(optionMenu,w=200)
 	template.define(textField,h=35)
+	template.define(checkBox,h=25,ed=False,w=150)
 
 	try :
 		cmds.deleteUI(assetsWindow)
@@ -40,12 +41,23 @@ def CreateUI(*args):
 	with window(assetsWindow, title='Assets Tools',menuBar=True,menuBarVisible=True) as win:
 		with template:
 			with columnLayout():
+				with frameLayout('Asset Status'):
+					with columnLayout():
+						with rowLayout(numberOfColumns=2,ad2=1):
+							button(label='Check again',en=True,bgc=(0,1,0),c='import assetsTools; reload(assetsTools); assetsTools.checkAssetStatus()')
+						with rowLayout(numberOfColumns=2,ad2=1):
+							checkBox(label='Duplicate names')
+							checkBox(label='Shape Origin')
+						with rowLayout(numberOfColumns=2,ad2=1):
+							checkBox(label='Freeze scales')
+							checkBox(label='Duplicate names')
+
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
-						button(label = 'Set Object To Zero',c='import assetsTools; reload(assetsTools); assetsTools.setObject()')
-						button(label = 'Fix Normals',c='import assetsTools; reload(assetsTools); assetsTools.fixNormals()')
-						button(label = 'Fix shapes names', c='import assetsTools; reload(assetsTools); assetsTools.fixShapesNames()')
-						button(label = 'CleanUp',c='import assetsTools; reload(assetsTools); assetsTools.cleanup()', en=False)
+						button(label='Set Object To Zero',c='import assetsTools; reload(assetsTools); assetsTools.setObject()')
+						button(label='Fix Normals',c='import assetsTools; reload(assetsTools); assetsTools.fixNormals()')
+						button(label='Fix shapes names', c='import assetsTools; reload(assetsTools); assetsTools.fixShapesNames()')
+						button(label='CleanUp',c='import assetsTools; reload(assetsTools); assetsTools.cleanup()', en=False)
 
 				with frameLayout('Prepare for render'):
 					with columnLayout():
@@ -68,3 +80,4 @@ def CreateUI(*args):
 				with frameLayout('Nomenclatures'):
 					with columnLayout():
 						button(label='Nomenclatures',h=30,c='import commonTools; reload(commonTools); commonTools.showNomenclatures()')
+CreateUI()
