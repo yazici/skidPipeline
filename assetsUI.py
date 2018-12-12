@@ -2,8 +2,8 @@
 
 import maya.cmds as cmds
 from functools import partial
-import commonTools
-import assetsTools
+# import commonTools
+# import assetsTools
 from pymel.core import *
 
 # **************** GLOBALS ****************
@@ -25,12 +25,12 @@ def addID(ID,*args):
 
 def CreateUI(*args):
 	template = uiTemplate('ExampleTemplate', force=True)
-	template.define(button, w=300, h=35, align='left')
+	template.define(button, w=299, h=35, align='left')
 	template.define(frameLayout, borderVisible=True, labelVisible=True)
 	template.define(rowColumnLayout,numberOfColumns=2)
 	template.define(optionMenu,w=200)
 	template.define(textField,h=35)
-	template.define(checkBox,h=25,ed=False,w=150)
+	template.define(checkBox,h=25,ed=False,w=147)
 
 	try :
 		cmds.deleteUI('assetsWindow')
@@ -44,17 +44,17 @@ def CreateUI(*args):
 				with frameLayout('Asset Status'): # Check if asset is ready for publish
 					with columnLayout():
 						with rowLayout(numberOfColumns=2,ad2=1):
-							button(label='Check again',en=True,bgc=(0,1,0), \
+							oui = 1
+							checkBox(label='Duplicate names',v=1,bgc=(0,1,0))
+							checkBox(label='Shape Origin')
+						with rowLayout(numberOfColumns=2,ad2=1):
+							checkBox(label='Freeze transforms')
+							checkBox(label='')
+						with rowLayout(numberOfColumns=2,ad2=1):
+							button(label='Check again',en=True, \
 								c='import assetsTools; \
 								reload(assetsTools); \
 								assetsTools.checkAssetStatus()')
-						with rowLayout(numberOfColumns=2,ad2=1):
-							checkBox(label='Duplicate names')
-							checkBox(label='Shape Origin')
-						with rowLayout(numberOfColumns=2,ad2=1):
-							checkBox(label='Freeze scales')
-							checkBox(label='Duplicate names')
-
 
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
