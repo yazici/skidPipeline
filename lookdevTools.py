@@ -39,6 +39,8 @@ def reloadLookdevScene(*arg):
 		pass
 
 def initTurn(obj,*arg):
+	hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
+
 	if obj == 'turn_locator':
 		delete_turn_loc()
 		cmds.spaceLocator(name=obj)
@@ -46,7 +48,7 @@ def initTurn(obj,*arg):
 		cmds.setAttr(obj+'.localScaleY',50)
 		cmds.setAttr(obj+'.localScaleZ',50)
 
-	elif obj == '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI':
+	elif obj == hdriTurnGrp:
 		if cmds.objExists(hdriTurnGrp) == False: # Check if GRP exists
 			cmds.warning('LookdevSetup:GRP_HDRI was not found, please take a nerf gun and shoot Clement because he fucked up')
 			import commonTools
@@ -90,7 +92,7 @@ def delete_turn_loc(*arg):
 	try:
 		cmds.delete(locatorName)
 	except ValueError:
-		cmds.warning('Turn locator does not exist or has been renamed')
+		pass
 
 def open_hdri_folder(*arg):
 	os.startfile(hdri_folder)

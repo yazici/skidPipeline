@@ -94,13 +94,13 @@ def CreateUI(*args):
 									reload(lookdevTools); \
 									lookdevTools.convertPxrSurfaceToLayer()',en=False)
 
-				with frameLayout('Turn'):
+				with frameLayout('Turn locator'):
 					with columnLayout():
 						with rowLayout(numberOfColumns=2,ad2=1):
 							button(label="Create turn locator",w=248, \
 								c='import lookdevTools; \
 								reload(lookdevTools); \
-								lookdevTools.initTurn(%s)') % turnLocator
+								lookdevTools.initTurn("%s")' % turnLocator)
 							button(label="Delete",  w=49, \
 								c='import lookdevTools; \
 								reload(lookdevTools); \
@@ -110,20 +110,22 @@ def CreateUI(*args):
 								button(label="%i frames" % i, w=98, \
 									c='import lookdevTools; \
 									reload(lookdevTools); \
-									lookdevTools.changeFrameRange(%s,%i)' % (turnLocator,i))
+									lookdevTools.changeFrameRange("%s",%i)' % (turnLocator,i))
+
+				with frameLayout('Turn Lighting'):
+					with columnLayout():
 						with rowLayout(numberOfColumns=3,ad3=2):
 							for i in turnDurations: # Create one button for each possible turn duration
 								button(label="%i frames" % i, w=98, \
 									c='import lookdevTools; \
 									reload(lookdevTools); \
-									lookdevTools.initTurn(%s) \
-									lookdevTools.changeFrameRange(%s,%i) \
-									lookdevTools.changeFrameRange(%s,%i,%i)' % (hdriTurnGrp,turnLocator,i,hdriTurnGrp,i,i))
+									lookdevTools.changeFrameRange("%s",%i); \
+									lookdevTools.changeFrameRange("%s",%i,%i)' % (turnLocator,i,hdriTurnGrp,i,i))
 						with rowLayout(numberOfColumns=1):
-							button(label='Disable lighting turn' \
+							button(label='Disable lighting turn', \
 								c='import lookdevTools; \
-								reload(lookdevTools) \
-								lookdevTools.disableTurn(%s)' % hdriTurnGrp)
+								reload(lookdevTools); \
+								lookdevTools.disableTurn("%s")' % hdriTurnGrp)
 
 				with frameLayout('Nomenclatures'):
 					button(label='Afficher nomenclatures',h=30, \
