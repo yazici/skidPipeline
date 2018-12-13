@@ -38,17 +38,27 @@ def reloadLookdevScene(*arg):
 	else :
 		pass
 
-def create_turn_loc(*arg):
-	locatorName = 'turn_locator'
-	delete_turn_loc()
-	cmds.spaceLocator(name=locatorName)
-	cmds.setAttr(locatorName+'.localScaleX',50)
-	cmds.setAttr(locatorName+'.localScaleY',50)
-	cmds.setAttr(locatorName+'.localScaleZ',50)
-	cmds.setKeyframe(locatorName,at='rotateY',t=1,v=0)
-	cmds.setKeyframe(locatorName,at='rotateY',t=101,v=360)
+def initTurn(obj,*arg):
+	hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
+
+	if obj == 'turn_locator':
+		delete_turn_loc()
+		cmds.spaceLocator(name=obj)
+		cmds.setAttr(obj+'.localScaleX',50)
+		cmds.setAttr(obj+'.localScaleY',50)
+		cmds.setAttr(obj+'.localScaleZ',50)
+
+	elif obj == hdriTurnGrp:
+		if cmds.objExists(hdriTurnGrp) == False: # Check if GRP exists
+			cmds.warning('LookdevSetup:GRP_HDRI was not found, please take a nerf gun and shoot Clement because he fucked up')
+			import commonTools
+			commonTools.areeeeett()
+			return
+
+	cmds.setKeyframe(obj,at='rotateY',t=1,v=0)
+	cmds.setKeyframe(obj,at='rotateY',t=101,v=360)
 	cmds.selectKey(clear=True)
-	cmds.selectKey(locatorName,time=(1,101),at='rotateY')
+	cmds.selectKey(obj,time=(1,101),at='rotateY')
 	cmds.keyTangent(itt='linear',ott='linear')
 	cmds.currentTime(1)
 	cmds.playbackOptions(min=1,max=100)
@@ -57,18 +67,25 @@ def create_turn_loc(*arg):
 	#set render settings end frame
 	cmds.setAttr('defaultRenderGlobals.endFrame',100)
 
+def disableTurn(obj,*args):
+	cmds.cutKey(obj,at='rotateY',option='keys',cl=True)
+	cmds.setAttr('%s.rotateY' % obj,0) 
 
-def change_frames_number(frameNbr,*args): #argument must be integer
-	locatorName = 'turn_locator'
-	cmds.cutKey(locatorName,at='rotateY',option='keys',cl=True)
-	cmds.setKeyframe(locatorName,at='rotateY',t=1,v=0)
-	cmds.setKeyframe(locatorName,at='rotateY',t=frameNbr+1,v=360)
-	cmds.selectKey(locatorName,t=(1,frameNbr+1),at='rotateY')
+def changeFrameRange(obj,frameNbr,offset=0,*args):
+	''' 
+	First argument is an object name (string)
+	Second argument is the desired number of frames for turn (integer)
+	Third argument is the number of frames to offset the turn of a lightrig. (integer, optional)
+	'''
+	cmds.cutKey(obj,at='rotateY',option='keys',cl=True)
+	cmds.setKeyframe(obj,at='rotateY',t=1+offset,v=0)
+	cmds.setKeyframe(obj,at='rotateY',t=frameNbr+1+offset,v=360)
+	cmds.selectKey(obj,t=(1+offset,frameNbr+1+offset),at='rotateY')
 	cmds.keyTangent(itt='linear', ott='linear')
-	cmds.playbackOptions(min=1,max=frameNbr,ast=1,aet=frameNbr)
+	cmds.playbackOptions(min=1,max=frameNbr+offset,ast=1,aet=frameNbr+offset)
 	cmds.selectKey(clear=True)
 	cmds.select(clear=True)
-	cmds.setAttr('defaultRenderGlobals.endFrame',frameNbr)
+	cmds.setAttr('defaultRenderGlobals.endFrame',frameNbr+offset)
 
 def delete_turn_loc(*arg):
 	locatorName = 'turn_locator'
@@ -81,7 +98,8 @@ def open_hdri_folder(*arg):
 	os.startfile(hdri_folder)
 
 def turnLights(*args):
-	hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
+	# hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
+	hdriTurnGrp
 	if cmds.objExists(hdriTurnGrp) == False:
 		cmds.warning('LookdevSetup:GRP_HDRI was not found, please take a nerf gun and shoot Clement because he fucked up')
 		return
