@@ -19,8 +19,8 @@ def addID(ID,*args):
 			cmds.warning(i+' already has an ID')
 		else :
 			cmds.rename(i,i+'_ID'+ID)
-			import assetsTools
-			assetsTools.fixShapesNames()
+			# import assetsTools
+			# assetsTools.fixShapesNames()
 
 # **************** INTERFACE ****************
 
