@@ -1,9 +1,13 @@
+# ****************************************** S K I D     A N I M     T O O L S ******************************************
+
 import maya.cmds as cmds
 import maya.mel as mel
 import commonTools
 import os
 import sys
 from pymel.core import *
+
+# ****************************************** F U N C T I O N S ******************************************
 
 def createSpeedAttribute(*args):
 	sel = cmds.ls(selection=True)

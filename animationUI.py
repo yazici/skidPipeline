@@ -1,18 +1,19 @@
+# ****************************************** S K I D     A N I M     U I ******************************************
+
 import maya.cmds as cmds
 import maya.mel as mel
 import os
 import commonTools
 from pymel.core import *
 
-
-# **************** GLOBAL VARIABLES ****************
+# ****************************************** G L O B A L S ******************************************
 
 animScriptsPath = '//Merlin/3d4/skid/09_dev/toolScripts/publish/animScripts'
 riggedAssets = ['propsEthanHelmet','propsAltonHelmet','characterRay','characterRay_pos','propsBrevell','propsWerner','propsKriz']
 chosenRig = []
 animationWindow = "animationWindow"
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def chooseRig(item,*args):
 	global chosenRig
@@ -23,7 +24,7 @@ def callImportRig(*args):
 	reload(commonTools)
 	commonTools.importAssetMa(chosenRig)
 
-# **************** INTERFACE ****************
+# ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
 	template = uiTemplate('ExampleTemplate', force=True)

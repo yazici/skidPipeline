@@ -1,4 +1,4 @@
-# **************** SKID LOOKDEV TOOLS ****************
+# ****************************************** S K I D    L O O K D E V    T O O L S ******************************************
 
 import maya.cmds as cmds
 import maya.mel as mel
@@ -7,13 +7,13 @@ from functools import partial
 import commonTools
 
 
-# **************** GLOBAL VARIABLES ****************
+# ****************************************** G L O B A LS ******************************************
 
 lookdevScenePath = os.path.abspath('//merlin/3d4/skid/09_dev/toolScripts/lookdev/lookdevSetup/LookdevSetup.ma')
 hdri_folder = os.path.abspath('//Merlin/3d4/skid/04_asset/SkidLibrary/HDRI')
 grpName = 'LookdevSetup:GRP_LookdevSetup'
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def importLookdevScene(*arg):
 	if cmds.objExists(grpName):

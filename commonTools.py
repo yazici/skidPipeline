@@ -1,14 +1,16 @@
+# ****************************************** S K I D     C O M M O N     T O O L S ******************************************
+
 import maya.cmds as cmds
 import datetime
 import os
 import sys
 
-# ****************************************** GLOBALS ******************************************
+# ****************************************** G L O B A L S ******************************************
 
 assetPath = os.path.abspath('//Merlin/3d4/skid/04_asset')
 shotPath = os.path.abspath('//Merlin/3d4/skid/05_shot')
 
-# ****************************************** FUNCTIONS ******************************************
+# ****************************************** F U N C T I O N S ******************************************
 
 def versionUp(*args):
 	# break full name with path on peaces: path, name, ext

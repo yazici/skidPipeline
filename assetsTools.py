@@ -1,4 +1,4 @@
-# **************** SKID ASSETS TOOLS ****************
+# ****************************************** S K I D     A S S E T S     T O O L S ******************************************
 
 import maya.cmds as cmds
 import maya.mel as mel
@@ -8,11 +8,11 @@ import sys
 import os
 import commonTools
 
-# **************** GLOBALS ****************
+# ****************************************** G L O B A L S ******************************************
 
 sel =  [] #create a variable with the selected object
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def setObject(*args): #Mise a zero de l asset
 	if commonTools.testSelection() == None:
@@ -67,8 +67,11 @@ def exportRIBarchive(*args):
 def fixShapesNames(*args):
 	sel = cmds.ls(sl=True)
 	shapes = cmds.listRelatives(sel,s=True,fullPath=True)
-	for shape in shapes :
-		cmds.rename(shape, "{0}Shape".format(cmds.listRelatives(shape, parent=True)[0]))
+	if not shapes:
+		cmds.warning('No shape were found in selection')
+	else:
+		for shape in shapes :
+			cmds.rename(shape, "{0}Shape".format(cmds.listRelatives(shape, parent=True)[0]))
 
 def exportMayaAscii(*args):
 	import maya.mel as mel

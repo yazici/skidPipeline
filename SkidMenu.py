@@ -1,3 +1,5 @@
+# ****************************************** S K I D     M E N U ******************************************
+
 import maya.cmds as cmds
 import maya.mel as mel
 

@@ -1,16 +1,14 @@
-# **************** SKID ASSETS TOOLS ****************
+# ****************************************** S K I D     A S S E T S     U I ******************************************
 
 import maya.cmds as cmds
 from functools import partial
-import commonTools
-import assetsTools
 from pymel.core import *
 
-# **************** GLOBALS ****************
+# ****************************************** G L O B A L S ******************************************
 
 assetsWindow = 'assetsWindow'
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def addID(ID,*args):
 	sel = cmds.ls(selection=True)
@@ -22,7 +20,7 @@ def addID(ID,*args):
 			# import assetsTools
 			# assetsTools.fixShapesNames()
 
-# **************** INTERFACE ****************
+# ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
 	template = uiTemplate('ExampleTemplate', force=True)
@@ -42,31 +40,72 @@ def CreateUI(*args):
 			with columnLayout():
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
-						button(label = 'Set Object To Zero',c='import assetsTools; reload(assetsTools); assetsTools.setObject()')
-						button(label = 'Fix Normals',c='import assetsTools; reload(assetsTools); assetsTools.fixNormals()')
-						button(label = 'Fix shapes names', c='import assetsTools; reload(assetsTools); assetsTools.fixShapesNames()')
-						button(label = 'CleanUp',c='import assetsTools; reload(assetsTools); assetsTools.cleanup()', en=False)
+						button(label = 'Set Object To Zero', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.setObject()')
+						button(label = 'Fix Normals', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.fixNormals()')
+						button(label = 'Fix shapes names', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.fixShapesNames()')
+						button(label = 'CleanUp', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.cleanup()', en=False)
 
 				with frameLayout('Prepare for render'):
 					with columnLayout():
 						with rowLayout(numberOfColumns=3,ad3=2):
 							button(l='Material ID',w=75,en=False)
 							textField(w=170,enterCommand=lambda *args: addID(args[0]),aie=True)
-							button(label='Remove',w=50,c='import assetsTools; reload(assetsTools); assetsTools.removeID()')
+							button(label='Remove',w=50, \
+								c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.removeID()')
 						with rowLayout(numberOfColumns=2):
-							button(label="Attach Subdiv Scheme",w=149,c='import commonTools; reload(commonTools); commonTools.RfMsubdivScheme(1)')
-							button(label="Detach Subdiv Scheme",w=148,c='import commonTools; reload(commonTools); commonTools.RfMsubdivScheme(0)')
+							button(label='Attach Subdiv Scheme',w=149, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(1)')
+							button(label="Detach Subdiv Scheme",w=148, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(0)')
 
 				with frameLayout('Export / Publish Asset'):
 					with columnLayout():
 						with rowLayout(numberOfColumns=4,ad4=2):
-							button(label='Export .ma',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportMayaAscii()')
-							button(label='Export .abc',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportAbcRfM()')
-							button(label='Export GPU',w=73,c='import assetsTools; reload(assetsTools); assetsTools.exportGPUcache()')
-							button(label='Export RIB',w=74,c='import assetsTools; reload(assetsTools); assetsTools.exportRIBarchive()',en=False)
-						button(label='Publish asset',c='import assetsTools; reload(assetsTools); assetsTools.publishAsset()',en=False)
+							button(label='Export .ma',w=73, \
+								c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.exportMayaAscii()')
+							button(label='Export .abc',w=73, \
+								c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.exportAbcRfM()')
+							button(label='Export GPU',w=73, \
+								c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.exportGPUcache()')
+							button(label='Export RIB',w=74, \
+								c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.exportRIBarchive()', \
+								en=False)
+						button(label='Publish asset', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.publishAsset()', \
+							en=False)
 
 				with frameLayout('Nomenclatures'):
 					with columnLayout():
-						button(label='Nomenclatures',h=30,c='import commonTools; reload(commonTools); commonTools.showNomenclatures()')
+						button(label='Nomenclatures',h=30, \
+							c='import commonTools; \
+							reload(commonTools); \
+							commonTools.showNomenclatures()')
 CreateUI()
