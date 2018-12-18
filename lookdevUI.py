@@ -1,9 +1,10 @@
+# ****************************************** S K I D     L O O K D E V    U I ******************************************
 import maya.cmds as cmds
 import os
 from functools import partial
 from pymel.core import *
 
-# **************** GLOBAL VARIABLES ****************
+# ****************************************** G L O B A L S ******************************************
 
 lookdevScenePath = os.path.abspath('//merlin/3d4/skid/09_dev/toolScripts/lookdev/lookdevSetup/LookdevSetup.ma')
 hdri_folder = os.path.abspath('//Merlin/3d4/skid/04_asset/SkidLibrary/HDRI')
@@ -15,13 +16,13 @@ lookdevPreset = 'SKID_LookdevSetup'
 scenePath = cmds.workspace(sn=True,q=True)
 turnDurations = [8,50,100]
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def chooseHDRfile(item,*args):
 	resolveHDRpath = os.path.join(hdri_folder,item)
 	cmds.setAttr('LookdevSetup:PxrDomeLight_HDRI.lightColorMap','%s' %resolveHDRpath,type='string')
 
-# **************** INTERFACE ****************
+# ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
 	# Try loading renderman and check version

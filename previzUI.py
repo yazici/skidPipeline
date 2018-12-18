@@ -1,4 +1,4 @@
-# **************** SKID PREVIZ UI ****************
+# ****************************************** S K I D    P R E V I Z    U I ******************************************
 
 import maya.cmds as cmds
 import maya.mel as mel
@@ -7,28 +7,10 @@ import commonTools
 import previzTools
 from pymel.core import *
 
-# **************** GLOBALS ****************
+# ****************************************** G L O B A L S ******************************************
 
-# **************** FUNCTIONS ****************
 
-# def CreateUI(*args):
-# 	if cmds.window("SkidPrevizTools", exists = True): #check to see if the window exists
-# 		cmds.deleteUI("SkidPrevizTools")
-
-# 	cmds.window("SkidPrevizTools", w = 300, h = 275)
-# 	cmds.columnLayout(adjustableColumn=True, w=300)
-
-# 	cmds.text(label='PREVIZ RENDER',h=25)
-# 	cmds.button(label='Import shot alembics',w=300,h=50,c='import previzTools; reload(previzTools); previzTools.importShotAlembics()')
-# 	cmds.button(label='Import shaders for alembics',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.importShaders()')
-# 	cmds.button(label='Assign shaders',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.assignShaders()')
-# 	cmds.button(label='Import Alembic as Reference',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.referenceAlembic()')
-# 	cmds.button(label='Set Frame Range From Camera',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.setShot()')
-# 	cmds.button(label='Publish shot',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.publishShot()')
-	
-# 	cmds.button(label='Nomenclatures',h=30,c='import commonTools; reload(commonTools); commonTools.showNomenclatures()')
-
-# 	cmds.showWindow("SkidPrevizTools")
+# ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
 	template = uiTemplate('ExampleTemplate', force=True)

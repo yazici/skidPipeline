@@ -1,4 +1,4 @@
-# **************** SKID PREVIZ TOOLS ****************
+# ****************************************** S K I D    P R E V I Z    T O O L S ******************************************
 
 import maya.cmds as cmds
 import maya.mel as mel
@@ -9,14 +9,14 @@ import sys
 import commonTools
 
 
-# **************** GLOBALS ****************
+# ****************************************** G L O B A L S ******************************************
 
 sel =  cmds.ls(selection = True) #create a variable with the selected object
 SkidAssets = os.path.abspath('//Merlin/3d4/skid/04_asset')
 animaticPath = os.path.abspath('//Merlin/3d4/skid/07_editing/input/02_animatic3D')
 animaticBackupPath = os.path.join(animaticPath,'backup')
 
-# **************** FUNCTIONS ****************
+# ****************************************** F U N C T I O N S ******************************************
 
 def exportAbcRfM(*args): #Export alembic avec attributes
 	try:

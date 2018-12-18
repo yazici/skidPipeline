@@ -1,14 +1,14 @@
-# **************** SKID RENDER UI ****************
+# ****************************************** S K I D    R E N D E R    U I ******************************************
 
 import maya.cmds as cmds
 from pymel.core import *
 
-# **************** GLOBALS ****************
+# ****************************************** G L O B A L S ******************************************
 
 pathTracerPreset = '.json'
 unifiedPreset = '.json'
 
-# **************** FUNCTIONS ****************
+# ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
 	# Load Renderman and check version
