@@ -25,16 +25,21 @@ def setObject(*args): #Mise a zero de l asset
 		cmds.delete(all=True, ch=True) #delete history
 		cmds.inViewMessage( amg='Ton asset <hl>'+str(sel)+'</hl> a ete mis a zero, bro.', pos='midCenter', fade=True )
 
-def fixNormals (*arg): #Regler les problemes de normal angle
+def fixNormals (*arg): # Fix normal for every selected objects
 	if commonTools.testSelection() == None:
 		cmds.warning('Nothing is selected')
 	else :
 		sel = commonTools.testSelection()
 		selAD = cmds.listRelatives(sel,ad=True)
-		for i in selAD:
-			cmds.polyNormalPerVertex(i,ufn=True)
-			cmds.polySetToFaceNormal(i) # probablement fait freeze aussi
-			cmds.polySoftEdge(i,a=60)
+		selShapes = cmds.listRelatives(sel,shapes=True,fullPath=True) # List selected shapes
+		for i in selAD: # Fix normal angles
+			cmds.polyNormalPerVertex(i,ufn=True) # Unlock normals
+			cmds.polySetToFaceNormal(i) # Set to face
+			cmds.polySoftEdge(i,a=60) # Set normal angle to 60
+		for i in selShapes: # Disable opposite normals
+			cmds.setAttr('%s.doubleSided' % i,0)
+			cmds.setAttr('%s.opposite' % i,0)
+			cmds.setAttr('%s.doubleSided' % i,1)
 		cmds.select(clear=True)
 		cmds.select(sel,r=True)
 
