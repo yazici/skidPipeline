@@ -44,6 +44,47 @@ def fixNormals (*arg): # Fix normal for every selected objects
 		cmds.select(sel,r=True)
 		cmds.inViewMessage( amg='Done ! Remember to delete history.', pos='midCenter', fade=True )
 
+def duplicateNamesDialog(*args):
+	confirm = cmds.confirmDialog(title='Rename duplicate names',message='Do you want to rename every object with duplicate names or just select them ?', button=['Rename','Select','Cancel'], defaultButton='Select', cancelButton='Cancel', dismissString='Cancel')
+	if confirm == 'Rename':
+		renameDuplicates(1)
+	elif confirm == 'Select':
+		renameDuplicates(2)
+
+def renameDuplicates(action,*args):
+	# Find all objects that have the same shortname as another
+	# We can indentify them because they have | in the name
+	import re
+	duplicates = [f for f in cmds.ls() if '|' in f]
+	if action == 1:
+		# Sort them by hierarchy so that we don't rename a parent before a child.
+		duplicates.sort(key=lambda obj: obj.count('|'), reverse=True)
+		# If we have duplicates, rename them
+		if duplicates:
+			for name in duplicates:
+				# Extract the base name
+				m = re.compile("[^|]*$").search(name) 
+				shortname = m.group(0)
+				
+				# Extract the numeric suffix
+				m2 = re.compile(".*[^0-9]").match(shortname) 
+				if m2:
+					stripSuffix = m2.group(0)
+				else:
+					stripSuffix = shortname
+				
+				# Rename, adding '#' as the suffix, which tells maya to find the next available number
+				newname = cmds.rename(name, (stripSuffix + "#")) 
+				print "renamed %s to %s" % (name, newname)
+				
+			return "Renamed %s objects with duplicated name." % len(duplicates)
+		else:
+			return "No Duplicates"
+	elif action == 2:
+		cmds.select(clear=True)
+		for i in duplicates:
+			cmds.select(i,add=True)
+
 def selObjWithoutUV(*args): # Select every object with no UV
 	ObjWithoutUV = []
 	allGeos = cmds.ls(typ="mesh")
@@ -170,22 +211,3 @@ def backupPublishedAsset(*args):
 
 def publishAsset(*args):
 	pass
-
-def renameDuplicates(*args):
-    import re
-    duplicates = [f for f in cmds.ls() if '|' in f]
-    duplicates.sort(key=lambda obj: obj.count('|'), reverse=True)
-    if duplicates:
-        for name in duplicates:
-            m = re.compile("[^|]*$").search(name) 
-            shortname = m.group(0)
-            m2 = re.compile(".*[^0-9]").match(shortname) 
-            if m2:
-                stripSuffix = m2.group(0)
-            else:
-                stripSuffix = shortname
-            newname = cmds.rename(name, (stripSuffix + "#")) 
-            print "renamed %s to %s" % (name, newname)
-        return False
-    else:
-        return True

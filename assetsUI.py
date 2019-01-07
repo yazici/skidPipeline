@@ -48,6 +48,10 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.fixNormals()')
+						button(label='Fix duplicate names', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.duplicateNamesDialog()')
 						button(label = 'Fix shapes names', \
 							c='import assetsTools; \
 							reload(assetsTools); \
@@ -60,6 +64,7 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.cleanup()', en=False)
+						
 
 				with frameLayout('Prepare for render'):
 					with columnLayout():
