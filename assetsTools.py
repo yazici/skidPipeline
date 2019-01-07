@@ -42,6 +42,7 @@ def fixNormals (*arg): # Fix normal for every selected objects
 			cmds.setAttr('%s.doubleSided' % i,1)
 		cmds.select(clear=True)
 		cmds.select(sel,r=True)
+		cmds.inViewMessage( amg='Done ! Remember to delete history.', pos='midCenter', fade=True )
 
 def selObjWithoutUV(*args): # Select every object with no UV
 	ObjWithoutUV = []
@@ -54,11 +55,13 @@ def selObjWithoutUV(*args): # Select every object with no UV
 	for i in ObjWithoutUV:
 		cmds.select(i,add=True)
 	if len(ObjWithoutUV) == 0:
-		cmds.warning('Every object have UVs')
+		cmds.inViewMessage( amg='Every object have UVs', pos='midCenter',fade=True )
 	elif len(ObjWithoutUV) == 1:
-		cmds.warning('%s object has no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV))
+		cmds.inViewMessage( amg='%s object has no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV) \
+			,pos='midCenter',fade=True )
 	else :
-		cmds.warning('%s objects have no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV))
+		cmds.inViewMessage( amg='%s objects have no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV) \
+			,pos='midCenter',fade=True )
 	return len(ObjWithoutUV), ObjWithoutUV
 
 def cleanup(*args):
