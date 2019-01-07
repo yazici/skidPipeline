@@ -91,6 +91,10 @@ def RfMsubdivScheme(onOff,*args): # Argument must be boolean
 	sel = cmds.ls(selection=True)
 	for i in sel:
 		cmds.setAttr(i+'.rman_subdivScheme',onOff)
+	if onOff == 0:
+		cmds.inViewMessage( amg='Detached subdiv scheme to %s objects' % (len(sel)),pos='midCenter',fade=True )
+	else:
+		cmds.inViewMessage( amg='Attached subdiv scheme to %s objects' % (len(sel)),pos='midCenter',fade=True )
 
 def areeeeett(*args): # Easter egg
 	import winsound

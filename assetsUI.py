@@ -44,10 +44,6 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.setObject()')
-						button(label = 'Fix Normals', \
-							c='import assetsTools; \
-							reload(assetsTools); \
-							assetsTools.fixNormals()')
 						button(label='Fix duplicate names', \
 							c='import assetsTools; \
 							reload(assetsTools); \
@@ -56,6 +52,10 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.fixShapesNames()')
+						button(label = 'Fix Normals', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.fixNormals()')
 						button(label = 'Select objects with no UV', \
 							c='import assetsTools; \
 							reload(assetsTools); \
