@@ -52,6 +52,10 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.fixShapesNames()')
+						button(label = 'Select objects with no UV', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.selObjWithoutUV()')
 						button(label = 'CleanUp', \
 							c='import assetsTools; \
 							reload(assetsTools); \

@@ -43,6 +43,24 @@ def fixNormals (*arg): # Fix normal for every selected objects
 		cmds.select(clear=True)
 		cmds.select(sel,r=True)
 
+def selObjWithoutUV(*args): # Select every object with no UV
+	ObjWithoutUV = []
+	allGeos = cmds.ls(typ="mesh")
+	for i in allGeos:
+		cmds.select(i)
+		if cmds.polyEvaluate(uvShell=True) == 0: 
+			ObjWithoutUV.append(i)
+	cmds.select(clear=True)
+	for i in ObjWithoutUV:
+		cmds.select(i,add=True)
+	if len(ObjWithoutUV) == 0:
+		cmds.warning('Every object have UVs')
+	elif len(ObjWithoutUV) == 1:
+		cmds.warning('%s object has no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV))
+	else :
+		cmds.warning('%s objects have no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV))
+	return len(ObjWithoutUV), ObjWithoutUV
+
 def cleanup(*args):
 	pass
 	#cmds.polyCleanupArgList (4 ( "1","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","2","0","0" ))
