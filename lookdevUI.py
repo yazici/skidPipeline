@@ -78,6 +78,17 @@ def CreateUI(*args):
 						for file in hdri_files:
 							menuItem(label=file)
 
+				with frameLayout('Geometries'):
+					with rowLayout(numberOfColumns=2):
+							button(label='Attach Subdiv Scheme',w=149, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(1)')
+							button(label="Detach Subdiv Scheme",w=148, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(0)')
+
 				with frameLayout('Shading'):
 					with columnLayout():
 						with rowLayout(numberOfColumns=2,ad2=1):

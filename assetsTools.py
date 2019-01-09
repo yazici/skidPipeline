@@ -103,11 +103,194 @@ def selObjWithoutUV(*args): # Select every object with no UV
 	else :
 		cmds.inViewMessage( amg='%s objects have no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV) \
 			,pos='midCenter',fade=True )
-	return len(ObjWithoutUV), ObjWithoutUV
+	return ObjWithoutUV
 
-def cleanup(*args):
-	pass
-	#cmds.polyCleanupArgList (4 ( "1","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","2","0","0" ))
+def isItClean(*args):
+	from pymel.core import *
+	import commonTools
+	reload(commonTools)
+	green = (0,.6,.2)
+	red = (.7,0,0)
+
+	# Save selection
+	sel = cmds.ls(selection=True)
+
+	# Test group name is correct
+	correctName = commonTools.currentShot()+'_grp'
+	if len(commonTools.testSelection()) != 1:
+		cmds.warning('Only one object must be selected')
+	elif len(commonTools.testSelection()) == 1 and commonTools.testSelection()[0] == correctName:
+		cleanGrp = green
+	else :
+		cmds.warning('Please select master group wich should be named %s' % correctName)
+		cleanGrp = red
+		return
+
+	# Test if scene contains duplicate names
+	duplicates = [f for f in cmds.ls() if '|' in f]
+	if not duplicates :
+		cleanDuplicates = green
+	else :
+		cleanDuplicates = red
+
+	# Test if master group is at world zero
+	correctTransforms = '([(0.0, 0.0, 0.0)], [(0.0, 0.0, 0.0)], [(1.0, 1.0, 1.0)])'
+	correctPivots = '[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]'
+
+	transforms = (cmds.getAttr('%s.translate' % sel[0]), \
+		cmds.getAttr('%s.rotate' % sel[0]),\
+		cmds.getAttr('%s.scale' % sel[0]))
+	pivots = cmds.xform(sel,pivots=True,query=True)
+	if str(transforms) != correctTransforms or str(pivots) != correctPivots:
+		cleanWorldZero = red
+	else :
+		cleanWorldZero = green
+
+	# Test freeze scales
+	selAllTransforms = cmds.listRelatives(sel,ad=True,typ='transform')
+	correctScale = '[(1.0, 1.0, 1.0)]'
+	notFreezed = []
+	for i in selAllTransforms:
+		if str(cmds.getAttr('%s.scale'%i)) != correctScale:
+			notFreezed.append(i)
+	if len(notFreezed) != 0:
+		cleanScales = red
+	else :
+		cleanScales = green
+
+	# Test nGones
+	cmds.select(sel,r=True)
+	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };')	
+	cmdNGones = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };\')'
+	if len(testClean) != 0:
+		cleanNGones = red
+	else :
+		cleanNGones = green
+
+	# Test nonManifold
+	cmds.select(sel,r=True)
+	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
+	cmdNonManifold = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };\')'
+	print len(cmds.ls(selection=True))
+	if len(testClean) != 0:
+		cleanNonManifold = red
+	else :
+		cleanNonManifold = green
+
+	# Test Edges with zero length
+	cmds.select(sel,r=True)
+	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };')
+	cmdEdgesZeroLength = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };\')'
+	if len(testClean) != 0:
+		cleanEdgesZeroLength = red
+	else :
+		cleanEdgesZeroLength = green
+
+	# Test faces with zero geometry area
+	cmds.select(sel,r=True)
+	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","1","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };')
+	cmdFacesZeroArea = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","1","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };\')'
+	if len(testClean) != 0:
+		cleanFacesZeroArea = red
+	else :
+		cleanFacesZeroArea = green
+
+	# Test UVs with zero map area
+	cmds.select(sel,r=True)
+	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","1","1e-05","0","-1","0","0" };')
+	cmdUVsZeroArea = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","1","1e-05","0","-1","0","0" };\')'
+	if len(testClean) != 0:
+		cleanUVsZeroArea = red
+	else :
+		cleanUVsZeroArea = green
+
+	# Test Objects with no UV
+	if len(selObjWithoutUV()) !=0:
+		cleanWithoutUvs = red
+	else :
+		cleanWithoutUvs = green
+
+
+	# Test objects opposite normals
+	selAllShapes = cmds.listRelatives(selAllTransforms,shapes=True)
+	withOpposites = []
+	for i in selAllShapes:
+		if cmds.getAttr('%s.opposite'%i) == 1:
+			withOpposites.append(i)
+	if len(withOpposites) != 0:
+		cleanOpposites = red
+	else :
+		cleanOpposites = green
+
+	# Restore selection
+	cmds.select(sel,r=True)
+
+	# Create Window with results
+	template = uiTemplate('ExampleTemplate', force=True)
+	template.define(button, w=100, h=25, align='left',l='Select',c='cmds.select("%s",r=True)' % sel[0])
+	template.define(frameLayout, borderVisible=True, labelVisible=True,w=300)
+	template.define(rowColumnLayout,numberOfColumns=2)
+	template.define(text,h=25,w=200)
+
+	try :
+		cmds.deleteUI('isItClean')
+	except RuntimeError :
+		pass
+
+	with window('isItClean', title='Is it clean ?',menuBar=True,menuBarVisible=True) as win:
+		with template:
+			with columnLayout():
+				with frameLayout('Names'):
+					with rowColumnLayout():
+						text(l='Master Group',bgc=cleanGrp)
+						button()
+
+						text(l='Duplicate names',bgc=cleanDuplicates)
+						button()
+
+				with frameLayout('Transforms'):
+					with rowColumnLayout():
+						text(l='Centered to world zero',bgc=cleanWorldZero)
+						button()
+
+						text(l='Freeze Scales',bgc=cleanScales)
+						button(c='notFreezed = %s; \
+							cmds.select(clear=True); \
+							cmds.select(notFreezed,add=True)' % notFreezed)
+
+				with frameLayout('Geometries'):
+					with rowColumnLayout():
+						text(l='nGones',bgc=cleanNGones)
+						button(c='%s'%cmdNGones)
+
+						text(l='Nonmanifold',bgc=cleanNonManifold)
+						button(c='%s'%cmdNonManifold)
+
+						text(l='Edges with zero length',bgc=cleanEdgesZeroLength)
+						button(c='%s'%cmdEdgesZeroLength)
+
+						text(l='Faces with zero geometry area',bgc=cleanFacesZeroArea)
+						button(c='%s'%cmdFacesZeroArea)
+
+						text(l='UVs with zero map area',bgc=cleanUVsZeroArea)
+						button(c='%s'%cmdUVsZeroArea)
+
+						text(l='Objects with no UV',bgc=cleanWithoutUvs)
+						button(c='import assetsTools; \
+								reload(assetsTools); \
+								assetsTools.selObjWithoutUV()')
+
+						text(l='Objects with opposite normals',bgc=cleanOpposites)
+						button(c='withOpposites = %s; \
+							cmds.select(clear=True); \
+							cmds.select(withOpposites,add=True)' % withOpposites)
+
+				# with frameLayout('Unwanted nodes'):
+				# 	with rowColumnLayout():
+				# 		text(l='')
+				# 		button()
+
+	
 
 def addID(ID,*args):
 	sel = cmds.ls(selection=True)
@@ -167,23 +350,6 @@ def exportGPUcache(*args):
 		import maya.cmds
 		import maya.utils
 		maya.utils.executeDeferred('''maya.cmds.loadPlugin('RenderMan_for_Maya.py')''')
-
-def prePublishAsset(*args):
-	# On test que la selection soit bien au bon format
-	correctName = currentShot()+'_grp' #le nom que doit avoir le groupe maitre
-	if len(testSelection()) > 1:
-		cmds.warning('Only one object must be selected for publish')
-	elif len(testSelection()) == 1 and testSelection()[0] == correctName:
-		assetFile = currentShot()+'.ma'
-		publishPath = os.path.join(cmds.workspace(sn=True,q=True),assetFile)
-		if os.path.exists(publishPath):
-			cmds.warning('Asset already has published version, backing up previous version...')
-			backupPublishedAsset()
-		else :
-			pass
-		publishAsset()
-	else :
-		cmds.warning('Selected group should look like : '+correctName)
 
 def createAssetBackupDir(*args):
 	publishedPath = os.path.abspath(cmds.workspace(sn=True,q=True))

@@ -40,10 +40,10 @@ def CreateUI(*args):
 			with columnLayout():
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
-						button(label = 'Set Object To Zero', \
+						button(label = 'IS IT CLEAN ?', \
 							c='import assetsTools; \
 							reload(assetsTools); \
-							assetsTools.setObject()')
+							assetsTools.isItClean()')
 						button(label='Fix duplicate names', \
 							c='import assetsTools; \
 							reload(assetsTools); \
@@ -60,10 +60,6 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.selObjWithoutUV()')
-						button(label = 'CleanUp', \
-							c='import assetsTools; \
-							reload(assetsTools); \
-							assetsTools.cleanup()', en=False)
 						
 
 				with frameLayout('Prepare for render'):
@@ -75,15 +71,15 @@ def CreateUI(*args):
 								c='import assetsTools; \
 								reload(assetsTools); \
 								assetsTools.removeID()')
-						with rowLayout(numberOfColumns=2):
-							button(label='Attach Subdiv Scheme',w=149, \
-								c='import commonTools; \
-								reload(commonTools); \
-								commonTools.RfMsubdivScheme(1)')
-							button(label="Detach Subdiv Scheme",w=148, \
-								c='import commonTools; \
-								reload(commonTools); \
-								commonTools.RfMsubdivScheme(0)')
+						# with rowLayout(numberOfColumns=2):
+						# 	button(label='Attach Subdiv Scheme',w=149, \
+						# 		c='import commonTools; \
+						# 		reload(commonTools); \
+						# 		commonTools.RfMsubdivScheme(1)')
+						# 	button(label="Detach Subdiv Scheme",w=148, \
+						# 		c='import commonTools; \
+						# 		reload(commonTools); \
+						# 		commonTools.RfMsubdivScheme(0)')
 
 				with frameLayout('Export / Publish Asset'):
 					with columnLayout():
