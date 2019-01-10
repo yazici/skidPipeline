@@ -182,7 +182,7 @@ def checkDatAss(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };')	
 	cmdNGones = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };\')'
-	if len(testClean) != 0:
+	if testClean:
 		cleanNGones = red
 	else :
 		cleanNGones = green
@@ -191,7 +191,7 @@ def checkDatAss(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
 	cmdNonManifold = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };\')'
-	if len(testClean) != 0:
+	if testClean:
 		cleanNonManifold = red
 	else :
 		cleanNonManifold = green
@@ -200,7 +200,7 @@ def checkDatAss(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };')
 	cmdEdgesZeroLength = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };\')'
-	if len(testClean) != 0:
+	if testClean:
 		cleanEdgesZeroLength = red
 	else :
 		cleanEdgesZeroLength = green
@@ -209,7 +209,7 @@ def checkDatAss(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","1","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };')
 	cmdFacesZeroArea = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","1","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };\')'
-	if len(testClean) != 0:
+	if testClean:
 		cleanFacesZeroArea = red
 	else :
 		cleanFacesZeroArea = green
@@ -218,7 +218,7 @@ def checkDatAss(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","1","1e-05","0","-1","0","0" };')
 	cmdUVsZeroArea = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","1","1e-05","0","-1","0","0" };\')'
-	if len(testClean) != 0:
+	if testClean:
 		cleanUVsZeroArea = red
 	else :
 		cleanUVsZeroArea = green
@@ -242,6 +242,31 @@ def checkDatAss(*args):
 		cleanOpposites = red
 	else :
 		cleanOpposites = green
+
+	# Test unwanted nodes
+	unwantedTypes = ['pointEmitter','nParticle','nCloth','nucleus']
+	unwanted = []
+	for i in unwantedTypes:
+		nodes = cmds.ls(typ=i)
+		if nodes:
+			for n in nodes:
+				unwanted.append(n)
+	if unwanted:
+		cleanUnwanted = red
+	else :
+		cleanUnwanted = green
+
+	# Test if empty transform nodes
+	allNodes = cmds.listRelatives(sel,ad=True)
+	emptyTransforms = []
+	print allNodes
+	for i in allNodes:
+		if not cmds.listRelatives(i,ad=True) and cmds.ls(i,typ='shape'):
+			emptyTransforms.append(i)
+	if emptyTransforms:
+		cleanemptyTransforms = red
+	else :
+		cleanemptyTransforms = green
 
 	# Restore selection
 	cmds.select(sel,r=True)
@@ -306,10 +331,17 @@ def checkDatAss(*args):
 							cmds.select(clear=True); \
 							cmds.select(withOpposites,add=True)' % withOpposites)
 
-				# with frameLayout('Unwanted nodes'):
-				# 	with rowColumnLayout():
-				# 		text(l='')
-				# 		button()
+				with frameLayout('Unwanted nodes'):
+					with rowColumnLayout():
+						text(l='Unwanted nodes',bgc=cleanUnwanted)
+						button(c='unwanted = %s; \
+							cmds.select(clear=True); \
+							cmds.select(unwanted,add=True)' % unwanted)
+						
+						text(l='Empty Transform nodes',bgc=cleanemptyTransforms)
+						button(c='emptyTransforms = %s; \
+							cmds.select(clear=True); \
+							cmds.select(emptyTransforms,add=True)' % emptyTransforms)
 
 	
 
