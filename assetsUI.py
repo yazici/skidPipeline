@@ -40,10 +40,10 @@ def CreateUI(*args):
 			with columnLayout():
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
-						button(label = 'IS IT CLEAN ?', \
+						button(label = 'CHECK DAT ASS(ET)', \
 							c='import assetsTools; \
 							reload(assetsTools); \
-							assetsTools.isItClean()')
+							assetsTools.checkDatAss()')
 						button(label='Fix duplicate names', \
 							c='import assetsTools; \
 							reload(assetsTools); \
@@ -71,15 +71,15 @@ def CreateUI(*args):
 								c='import assetsTools; \
 								reload(assetsTools); \
 								assetsTools.removeID()')
-						# with rowLayout(numberOfColumns=2):
-						# 	button(label='Attach Subdiv Scheme',w=149, \
-						# 		c='import commonTools; \
-						# 		reload(commonTools); \
-						# 		commonTools.RfMsubdivScheme(1)')
-						# 	button(label="Detach Subdiv Scheme",w=148, \
-						# 		c='import commonTools; \
-						# 		reload(commonTools); \
-						# 		commonTools.RfMsubdivScheme(0)')
+						with rowLayout(numberOfColumns=2):
+							button(label='Attach Subdiv Scheme',w=149, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(1)')
+							button(label="Detach Subdiv Scheme",w=148, \
+								c='import commonTools; \
+								reload(commonTools); \
+								commonTools.RfMsubdivScheme(0)')
 
 				with frameLayout('Export / Publish Asset'):
 					with columnLayout():

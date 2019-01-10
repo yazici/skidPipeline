@@ -98,32 +98,48 @@ def selObjWithoutUV(*args): # Select every object with no UV
 	if len(ObjWithoutUV) == 0:
 		cmds.inViewMessage( amg='Every object have UVs', pos='midCenter',fade=True )
 	elif len(ObjWithoutUV) == 1:
-		cmds.inViewMessage( amg='%s object has no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV) \
+		cmds.inViewMessage( amg='%s object has no UV' %len(ObjWithoutUV) \
 			,pos='midCenter',fade=True )
 	else :
-		cmds.inViewMessage( amg='%s objects have no UV : %s' % (len(ObjWithoutUV), ObjWithoutUV) \
+		cmds.inViewMessage( amg='%s objects have no UV' %len(ObjWithoutUV) \
 			,pos='midCenter',fade=True )
 	return ObjWithoutUV
 
-def isItClean(*args):
+def checkDatAss(*args):
 	from pymel.core import *
+	import maya.OpenMaya as om
+	import fnmatch
 	import commonTools
 	reload(commonTools)
 	green = (0,.6,.2)
 	red = (.7,0,0)
 
-	# Save selection
-	sel = cmds.ls(selection=True)
-
 	# Test group name is correct
-	correctName = commonTools.currentShot()+'_grp'
-	if len(commonTools.testSelection()) != 1:
-		cmds.warning('Only one object must be selected')
-	elif len(commonTools.testSelection()) == 1 and commonTools.testSelection()[0] == correctName:
-		cleanGrp = green
+	correctName = commonTools.currentShot()+'*_grp' # Wild card to enable model variations
+	filtered = fnmatch.filter(cmds.ls(), correctName)
+	if not filtered :
+		cmds.warning('No matching group was found. Master group should look like : %s (where * can be replaced by anything)'%correctName)
+		return
 	else :
-		cmds.warning('Please select master group wich should be named %s' % correctName)
-		cleanGrp = red
+		sel = filtered
+		cleanGrp = green
+
+	# Test group is not empty
+	if not cmds.listRelatives(sel):
+		cmds.warning('%s is empty'%sel)
+		return
+
+	# Test if scene contains instances
+	instances = []
+	iterDag = om.MItDag(om.MItDag.kBreadthFirst)
+	while not iterDag.isDone():
+		instanced = om.MItDag.isInstanced(iterDag)
+		if instanced :
+			instances.append(iterDag.fullPathName())
+		iterDag.next()
+	if instances:
+		cmds.warning('Your scene contains instances, please convert them to objects before you can continue')
+		cmds.select(instances,r=True)
 		return
 
 	# Test if scene contains duplicate names
@@ -132,6 +148,9 @@ def isItClean(*args):
 		cleanDuplicates = green
 	else :
 		cleanDuplicates = red
+		cmds.warning('Your asset contains duplicate names. You need to fix them before you can continue')
+		duplicateNamesDialog()
+		return
 
 	# Test if master group is at world zero
 	correctTransforms = '([(0.0, 0.0, 0.0)], [(0.0, 0.0, 0.0)], [(1.0, 1.0, 1.0)])'
@@ -140,11 +159,12 @@ def isItClean(*args):
 	transforms = (cmds.getAttr('%s.translate' % sel[0]), \
 		cmds.getAttr('%s.rotate' % sel[0]),\
 		cmds.getAttr('%s.scale' % sel[0]))
-	pivots = cmds.xform(sel,pivots=True,query=True)
-	if str(transforms) != correctTransforms or str(pivots) != correctPivots:
-		cleanWorldZero = red
-	else :
-		cleanWorldZero = green
+	for i in sel:
+		pivots = cmds.xform(i,pivots=True,query=True)
+		if str(transforms) != correctTransforms or str(pivots) != correctPivots:
+			cleanWorldZero = red
+		else :
+			cleanWorldZero = green
 
 	# Test freeze scales
 	selAllTransforms = cmds.listRelatives(sel,ad=True,typ='transform')
@@ -171,7 +191,6 @@ def isItClean(*args):
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
 	cmdNonManifold = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };\')'
-	print len(cmds.ls(selection=True))
 	if len(testClean) != 0:
 		cleanNonManifold = red
 	else :
@@ -210,13 +229,15 @@ def isItClean(*args):
 	else :
 		cleanWithoutUvs = green
 
-
 	# Test objects opposite normals
 	selAllShapes = cmds.listRelatives(selAllTransforms,shapes=True)
 	withOpposites = []
 	for i in selAllShapes:
-		if cmds.getAttr('%s.opposite'%i) == 1:
-			withOpposites.append(i)
+		try :
+			if cmds.getAttr('%s.opposite'%i) == 1:
+				withOpposites.append(i)
+		except:
+			pass
 	if len(withOpposites) != 0:
 		cleanOpposites = red
 	else :
@@ -233,14 +254,14 @@ def isItClean(*args):
 	template.define(text,h=25,w=200)
 
 	try :
-		cmds.deleteUI('isItClean')
+		cmds.deleteUI('checkDatAss')
 	except RuntimeError :
 		pass
 
-	with window('isItClean', title='Is it clean ?',menuBar=True,menuBarVisible=True) as win:
+	with window('checkDatAss', title='Check Dat Ass(et)',menuBar=True,menuBarVisible=True) as win:
 		with template:
 			with columnLayout():
-				with frameLayout('Names'):
+				with frameLayout('Naming'):
 					with rowColumnLayout():
 						text(l='Master Group',bgc=cleanGrp)
 						button()
