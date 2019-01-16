@@ -338,10 +338,10 @@ def checkDatAss(*args):
 							cmds.select(clear=True); \
 							cmds.select(unwanted,add=True)' % unwanted)
 						
-						text(l='Empty Transform nodes',bgc=cleanemptyTransforms)
-						button(c='emptyTransforms = %s; \
-							cmds.select(clear=True); \
-							cmds.select(emptyTransforms,add=True)' % emptyTransforms)
+						# text(l='Empty Transform nodes',bgc=cleanemptyTransforms)
+						# button(c='emptyTransforms = %s; \
+						# 	cmds.select(clear=True); \
+						# 	cmds.select(emptyTransforms,add=True)' % emptyTransforms)
 
 	
 

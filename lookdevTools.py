@@ -172,8 +172,38 @@ def createPxrLayerNetwork(*args):
 	# cmds.connectAttr('%s.pxrMaterialOut' % lyr2, '%s.layer1' % lmix)
 
 def convertPxrSurfaceToLayer(*args):
-	pass
-	# fullnames = []
-	# for attribute in attributes :
-	# 	fullname = cmds.getAttr(psurf+'.'+attribute)
-	# 	fullnames.append(str(fullname))
+	shaders = cmds.ls(selection=True, materials=True)
+	if not shaders:
+		cmds.warning('No material is selected')
+		return
+	for shader in shaders:
+		shaderType = cmds.nodeType(shader,d=True)
+		print 'Selected shader type for %s is %s'%(shader,shaderType)
+		if shaderType[0] == "PxrSurface":
+			newShader = cmds.shadingNode("PxrLayer",asShader=True,name="converted_"+shader)
+		elif shaderType[0] == "PxrLayer":
+			newShader = cmds.shadingNode("PxrSurface",asShader=True,name="converted_"+shader)
+		else:
+			return
+
+		attrList = cmds.listAttr(sa=True)
+		# First, try to get and set values
+		for attr in attrList :
+			try:
+				attrValue = cmds.getAttr(shader+"."+attr)
+			except ValueError:
+				print 'Could not get value for %s'%attr
+				pass
+			try:
+				cmds.setAttr(newShader+"."+attr,attrValue)
+			except RuntimeError:
+				print 'Could not set value for %s'%attr
+				pass
+		# Then try to get connection and reconnect
+		# attrList = cmds.listConnections(shader)
+		# for attr in attrList:
+		# 	try :
+		# 		cmds.connectionInfo()
+				
+	# Pour ameliorer : if begins with "enable" set gain to 1
+	# if begins with "rr" delete rr dans le nom de lattr pour compatibilite glass

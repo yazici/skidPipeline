@@ -104,7 +104,7 @@ def CreateUI(*args):
 								button(l='Convert PxrSurface to PxrLayer', \
 									c='import lookdevTools; \
 									reload(lookdevTools); \
-									lookdevTools.convertPxrSurfaceToLayer()',en=False)
+									lookdevTools.convertPxrSurfaceToLayer()')
 
 				with frameLayout('Turn locator'):
 					with columnLayout():
