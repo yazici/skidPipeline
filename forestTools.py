@@ -3,13 +3,15 @@ import maya.mel as mel
 import os
 
 
-def fireHoudini(*args):
+def fireHoudini(*args,mtop=0.2,mright=0.2,mbot=0.2,mleft=0.2):
+	'''This function opens a headless version of houdini and computes
+	a point cloud for trees instancing depending on the shot camera movement.'''
 	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
 	# Check current shot
 	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
 	currentShot = os.path.split(currentWorkspace)[1]
 	# Fire headless Houdini 
-	os.system('hython createInstancerPoints.py %s %s %s' currentShot,arg1,arg2)
+	os.system('hython createInstancerPoints.py %s %s %s %d %d %d %d' currentShot,fstart,fend,mtop,mright,mbot,mleft)
 
 def checkHoudiniEngine(*args):
 	cmds.loadPlugin('houdiniEngine')
@@ -20,6 +22,7 @@ def checkHoudiniEngine(*args):
 	else :
 		return True
 
+'''
 def loadShotPoints(*args):
 	toolBgeoToMaya = os.path.abspath('//merlin/3d4/skid/04_asset/hda/toolBgeoToMaya.hda')
 	cmds.houdiniAsset(la=[toolBgeoToMaya,'Object/toolBgeoToMaya'])
