@@ -1,20 +1,42 @@
+# ****************************************** S K I D     F O R E S T     T O O L S ******************************************
+
 import maya.cmds as cmds
 import maya.mel as mel
 import os
 
+# ****************************************** G L O B A L S ******************************************
 
-def fireHoudini(*args,mtop=0.2,mright=0.2,mbot=0.2,mleft=0.2):
+
+
+# ****************************************** F U N C T I O N S ******************************************
+
+def fireHoudini(mtop,mright,mbot,mleft,*args):
 	'''This function opens a headless version of houdini and computes
-	a point cloud for trees instancing depending on the shot camera movement.'''
-	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
+	a point cloud for trees instancing depending on the shot camera position and movements.
+	Arguments are camera frustrum margins and should be a float between 0 and 1'''
+	
+	# User prompt before firing up
+	confirmTxt = 'This process can take some minutes. Please check your frame range is right before you continue.'
+	confirm = cmds.confirmDialog(title='Playblast',message=confirmTxt,button=['Continue','Cancel'],defaultButton='Continue',cancelButton='Cancel',dismissString='Cancel')
+	if confirm != 'Continue':
+		return
 	# Check current shot
 	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
 	currentShot = os.path.split(currentWorkspace)[1]
+	# Get Frame range
+	fstart = cmds.playbackOptions(ast=True,q=True)
+	fend = cmds.playbackOptions(aet=True,q=True)
 	# Fire headless Houdini 
-	os.system('hython createInstancerPoints.py %s %s %s %d %d %d %d' currentShot,fstart,fend,mtop,mright,mbot,mleft)
+	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
+	os.system('hython %s %s %d %d %d %d %d %d'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
 
 def checkHoudiniEngine(*args):
-	cmds.loadPlugin('houdiniEngine')
+	# Load Houdini Engine for Maya and check if version is at least 17
+	try :
+		cmds.loadPlugin('houdiniEngine')
+	except :
+		cmds.warning('Could not load Houdini Engine')
+		return False
 	EngineVersion = mel.eval('houdiniEngine -hv;')
 	if not '17.' in EngineVersion :
 		cmds.warning('Wrong Houdini Engine version (installed version is '+EngineVersion+'), should be at least version 17')
@@ -24,6 +46,9 @@ def checkHoudiniEngine(*args):
 
 '''
 def loadShotPoints(*args):
+	# This function will load the generated point cloud in Maya via Houdini Engine
+	if checkHoudiniEngine() == False:
+		return
 	toolBgeoToMaya = os.path.abspath('//merlin/3d4/skid/04_asset/hda/toolBgeoToMaya.hda')
 	cmds.houdiniAsset(la=[toolBgeoToMaya,'Object/toolBgeoToMaya'])
 	#set file path to shot points
@@ -71,6 +96,3 @@ def loadShotPoints(*args):
 			$attrValue = `getParticleAttr -at $attr -array true ($hdaPartShp+".pt["+$i+"]")`;
 			# // setParticleAttr -at $attr -vv $attrValue[0] $attrValue[1] $attrValue[2] ($dupliPartShp+".pt["+$i+"]");
 			particle -e -at $attr -order $i -vv $attrValue[0] $attrValue[1] $attrValue[2];
-
-	if checkHoudiniEngine() == True:
-		loadShotPoints()

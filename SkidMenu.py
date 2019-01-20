@@ -38,10 +38,13 @@ def createMenu():
 		c='import previzUI; \
 		reload(previzUI); \
 		previzUI.CreateUI()')
+	cmds.menuItem(parent = SkidToolsMenu, label = "Rigging Tools", \
+		image='SkidMenu_rig.png', en=False)
 	cmds.menuItem(parent = SkidToolsMenu, label = "Render Tools", \
 		image='SkidMenu_render.png',
 		c='import renderUI; \
 		reload(renderUI); \
 		renderUI.CreateUI()',en=False)
-	cmds.menuItem(parent = SkidToolsMenu, label = "Rigging Tools", \
-		image='SkidMenu_rig.png', en=False)
+	cmds.menuItem(parent=SkidToolsMenu, label="Forest Tools", \
+		c='import forestUI; \
+		reload(forestUI)')
