@@ -25,7 +25,7 @@ template.define(button, w=300, h=35, align='left')
 template.define(frameLayout, borderVisible=True, labelVisible=True)
 template.define(rowColumnLayout,numberOfColumns=2)
 template.define(optionMenu,w=200)
-template.define(floatSliderGrp,w=300,h=30,f=True,min=0.0,max=1.0,s=0.1,v=0.1,cl3=('left','left','left'),cw3=(80,80,140))
+template.define(floatSliderGrp,w=300,h=25,f=True,min=0.0,max=1.0,s=0.1,v=0.1,cl3=('left','left','left'),cw3=(80,80,140))
 
 try :
 	cmds.deleteUI(forestWindow)
@@ -36,9 +36,9 @@ with window(forestWindow, title='Forest Tools',menuBar=True,menuBarVisible=True)
 	with template:
 		with columnLayout():
 			with frameLayout('Point Cloud'):
-				mtop = floatSliderGrp(l='Marge haut')
-				mright = floatSliderGrp(l='Marge droite')
-				mbot = floatSliderGrp(l='Marge bas')
-				mleft = floatSliderGrp(l='Marge gauche')				
-				b = cmds.button('print value')
+				mtop = floatSliderGrp(l='Margin top')
+				mright = floatSliderGrp(l='Margin right')
+				mbot = floatSliderGrp(l='Margin bottom')
+				mleft = floatSliderGrp(l='Margin left')				
+				b = cmds.button('Compute point cloud')
 				button(b, e=True, c=call_fireHoudini)

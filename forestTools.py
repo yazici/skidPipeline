@@ -2,7 +2,7 @@
 
 import maya.cmds as cmds
 import maya.mel as mel
-import os
+import os, subprocess
 
 # ****************************************** G L O B A L S ******************************************
 
@@ -16,19 +16,23 @@ def fireHoudini(mtop,mright,mbot,mleft,*args):
 	Arguments are camera frustrum margins and should be a float between 0 and 1'''
 	
 	# User prompt before firing up
-	confirmTxt = 'This process can take some minutes. Please check your frame range is right before you continue.'
-	confirm = cmds.confirmDialog(title='Playblast',message=confirmTxt,button=['Continue','Cancel'],defaultButton='Continue',cancelButton='Cancel',dismissString='Cancel')
+	confirmTxt = 'This process can take some minutes. Please check your frame range and margins are right before you continue.'
+	confirm = cmds.confirmDialog(title='Compute point cloud',message=confirmTxt,button=['Continue','Cancel'], \
+		defaultButton='Continue',cancelButton='Cancel',dismissString='Cancel')
 	if confirm != 'Continue':
 		return
 	# Check current shot
 	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
-	currentShot = os.path.split(currentWorkspace)[1]
+	currentShot = str(os.path.split(currentWorkspace)[1])
 	# Get Frame range
 	fstart = cmds.playbackOptions(ast=True,q=True)
 	fend = cmds.playbackOptions(aet=True,q=True)
 	# Fire headless Houdini 
 	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
-	os.system('hython %s %s %d %d %d %d %d %d'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
+	print(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft)
+	# os.system('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
+	# os.system('hython //Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py')
+	subprocess.call('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
 
 def checkHoudiniEngine(*args):
 	# Load Houdini Engine for Maya and check if version is at least 17
@@ -59,11 +63,11 @@ def loadShotPoints(*args):
 	cmds.evalDeferred('cmds.houdiniAsset(syn="toolBgeoToMaya1")') #sync
 
 
-	# Nom du sys de part cree par l'asset - à rentrer à la main pour le moment
+	# Nom du sys de part cree par l'asset - a rentrer a la main pour le moment
 	string $hdaPartXf = "file_bgeoToMaya_0";
-	# // List des attr à transferer - à rentrer à la main pour le moment
+	# // List des attr a transferer - a rentrer a la main pour le moment
 	string $vectorAttrListToTransfert[] = {"rgbPP", "radiusPP", "particleId "};
-	# // New name suffixe - à rentrer à la main
+	# // New name suffixe - a rentrer a la main
 	string $newNameSuffixe = "dupli";
 
 
@@ -83,9 +87,9 @@ def loadShotPoints(*args):
 	for($attr in $vectorAttrListToTransfert)
 		addAttr -ln $attr -dt vectorArray $dupliPartShp;
 		addAttr -ln ($attr+"0") -dt vectorArray $dupliPartShp;
-		# // le attr0 doit etre la valeur initiale, ca ne fonctionne pas sans la création.
+		# // le attr0 doit etre la valeur initiale, ca ne fonctionne pas sans la creation.
 
-	# // On remplit le nouveau sys en recupérant la pos des particules
+	# // On remplit le nouveau sys en recuperant la pos des particules
 	for($i=0; $i<$nbPart; $i++)
 		$wPos = `getParticleAttr -at position -array true ($hdaPartShp+".pt["+$i+"]")`;
 		emit -o $dupliPartXf -pos $wPos[0] $wPos[1] $wPos[2];
@@ -96,3 +100,4 @@ def loadShotPoints(*args):
 			$attrValue = `getParticleAttr -at $attr -array true ($hdaPartShp+".pt["+$i+"]")`;
 			# // setParticleAttr -at $attr -vv $attrValue[0] $attrValue[1] $attrValue[2] ($dupliPartShp+".pt["+$i+"]");
 			particle -e -at $attr -order $i -vv $attrValue[0] $attrValue[1] $attrValue[2];
+'''
