@@ -46,5 +46,6 @@ def createMenu():
 		reload(renderUI); \
 		renderUI.CreateUI()',en=False)
 	cmds.menuItem(parent=SkidToolsMenu, label="Forest Tools", \
+		image='SkidMenu_forest.png', \
 		c='import forestUI; \
 		reload(forestUI)')

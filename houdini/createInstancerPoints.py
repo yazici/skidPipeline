@@ -39,20 +39,22 @@ print('Loaded scene succesfully')
 
 
 # 2. Set toolCamImport to current shot
-
-# VERIFIER SI LE FICHIER ABC DE LA CAM EXISTE PARCE QUE HOUDINI LE FAIT PAS
-
+# Verify if camera alembic exists :
+abcPath = '//Merlin/3d4/skid/05_shot/%s/abc/%s.abc'%(currentShot,currentShot)
+if not os.path.isfile(abcPath):
+	print('%s was not found. Please export your camera from Maya before you can continue.'%abcPath)
+	os.system('pause')
+	sys.exit()
 cam = '/obj/CameraImport1/'
-hou.parm(cam+'fileName').set('$SHOT/%s/abc/%s.abc'%(currentShot,currentShot))
+hou.parm(cam+'fileName').set(abcPath)
 hou.parm(cam+'buildHierarchy').pressButton()
-# hou.node(cam+'/obj/geo1/file1').parm('reload').pressButton() # Si la ligne au dessus ne marche pas
 print('Camera imported succesfully')
 
 
 # 3. Set up volume parameters
 # Set camera path
 volumePath = '/obj/setGleitenstrasse1/export_to_Maya/export_shot_scatterPoints_to_maya/volume2/'
-camPath = '/obj/CameraImport1/shotCamera/%s/%sShape'%(currentShot,currentShot)
+camPath = '%sshotCamera/%s/%sShape'%(cam,currentShot,currentShot)
 hou.parm(volumePath+'camera').set(camPath)
 # Set margins
 hou.parm(volumePath+'winxmin').set(str(mleft))
@@ -66,26 +68,24 @@ print('Volume setup done')
 hou.playbar.setFrameRange(fstart,fend)
 hou.playbar.setPlaybackRange(fstart,fend)
 hou.setFrame(fend)
-# Verifier que le timeshift a bien $FEND en value
-print('Frame range set to %s-%s'%(fstart,fend))
+print('Frame range set to : %s - %s'%(fstart,fend))
 
 
 # 5. Filecache
 fcPath = '/obj/setGleitenstrasse1/export_to_Maya/export_shot_scatterPoints_to_maya/fc_pointsToMaya/'
-bgeoPath = '$SHOT/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
+bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
 hou.parm(fcPath+'file').set(str(bgeoPath))
 print('Caching instancer points to : '+bgeoPath)
 hou.parm(fcPath+'execute').pressButton()
-print('Done !')
-os.system('pause')
 
 
 # 6. Check if bgeo exists
-if not os.path.exist(bgeoPath):
-	print('Point cloud cache failed for '+currentShot)
+if not os.path.isfile(bgeoPath):
+	print('Point cloud cache FAILED for '+currentShot)
 	os.system('pause')
 	hou.exit(exit_code=1, suppress_save_prompt=True)
 else :
-	print('Point cloud was succesfully cached for '+currentShot)
+	print('Point cloud was succesfully cached for %s, cache path is :'%currentShot)
+	print(bgeoPath)
 	os.system('pause')
 	hou.exit(exit_code=0, suppress_save_prompt=True)

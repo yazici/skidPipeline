@@ -34,7 +34,7 @@ def fireHoudini(mtop,mright,mbot,mleft,*args):
 	# os.system('hython //Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py')
 	subprocess.call('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
 
-def checkHoudiniEngine(*args):
+def loadHoudiniEngine(*args):
 	# Load Houdini Engine for Maya and check if version is at least 17
 	try :
 		cmds.loadPlugin('houdiniEngine')
@@ -48,56 +48,129 @@ def checkHoudiniEngine(*args):
 	else :
 		return True
 
-'''
 def loadShotPoints(*args):
-	# This function will load the generated point cloud in Maya via Houdini Engine
-	if checkHoudiniEngine() == False:
+	'''This function will load the generated point cloud in Maya via Houdini Engine.
+	It will then copy each point and their attribute to a new point cloud to get rid of Houdini Engine.'''
+
+	# Load Houdini Engine
+	if loadHoudiniEngine() == False:
 		return
+
+	# Check if point cloud exists
+	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
+	currentShot = str(os.path.split(currentWorkspace)[1])
+	bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
+	if not os.path.isfile(bgeoPath):
+		print('Point cloud not found for %s'%currentShot)
+		return
+
+	# Set persp far clip plane
+	cmds.setAttr('perspShape.farClipPlane',1000000)
+
+	# Set current time to first frame
+	fstart = cmds.playbackOptions(ast=True,q=True)
+	cmds.currentTime(fstart)
+
+	# Load the bgeo importer
 	toolBgeoToMaya = os.path.abspath('//merlin/3d4/skid/04_asset/hda/toolBgeoToMaya.hda')
 	cmds.houdiniAsset(la=[toolBgeoToMaya,'Object/toolBgeoToMaya'])
-	#set file path to shot points
-	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
-	currentShot = os.path.split(currentWorkspace)[1]
-	pointsFromHoudini = currentWorkspace+'/geo/fileCache'+currentShot+'.fc_pointsToMaya.$F4.bgeo.sc'
-	cmds.setAttr('toolBgeoToMaya1.houdiniAssetParm.houdiniAssetParm_file',pointsFromHoudini,type="string")
-	cmds.evalDeferred('cmds.houdiniAsset(syn="toolBgeoToMaya1")') #sync
+	# Set file path to shot points
+	cmds.setAttr('toolBgeoToMaya1.houdiniAssetParm.houdiniAssetParm_file',bgeoPath,type="string")
+	# Sync asset
+	# cmds.evalDeferred('cmds.houdiniAsset(syn="toolBgeoToMaya1")')
+	cmds.houdiniAsset(syn="toolBgeoToMaya1")
 
 
-	# Nom du sys de part cree par l'asset - a rentrer a la main pour le moment
-	string $hdaPartXf = "file_bgeoToMaya_0";
-	# // List des attr a transferer - a rentrer a la main pour le moment
-	string $vectorAttrListToTransfert[] = {"rgbPP", "radiusPP", "particleId "};
-	# // New name suffixe - a rentrer a la main
-	string $newNameSuffixe = "dupli";
+	# Duplicate point cloud to get rid of houdini engine
+	pointCloud = 'file_bgeoToMaya_0'
+	pointCloud_s = pointCloud+'Shape'
+	vAttrToTransfer = ['rgbPP','radiusPP']
+	dAttrToTransfer = ['particleId']
+	newNameSuffix = '_dupli'
+
+	# Get particle count
+	nbPart = cmds.particle(pointCloud,q=True,ct=True)
+
+	# Create new particle system with suffix
+	tmp = cmds.particle(n=pointCloud+newNameSuffix)
+	dupliPartXf = tmp[0]
+	dupliPartShp = tmp[1]
+
+	# Create vector attributes on the new system
+	for attr in vAttrToTransfer:
+		try :
+			cmds.addAttr(dupliPartShp,ln=attr,dt='vectorArray')
+		except RuntimeError :
+			cmds.warning('Cant create attribute %s'%attr)
+		try :
+			cmds.addAttr(dupliPartShp,ln=attr+'0',dt='vectorArray')
+		except RuntimeError :
+			cmds.warning('Cant create attribute '+attr+'0')
+		# L'attr0 doit etre la valeur initiale, ca ne fonctionne pas sans la creation
+	cmds.setAttr(dupliPartShp+'.isDynamic',False)
+
+	# Fill new particle system with positions
+	for i in range(nbPart):
+		wPos = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at='position',array=True)
+		cmds.emit(o=dupliPartXf,pos=[wPos[0],wPos[1],wPos[2]])
+
+	# Transfer vector attributes
+	for attr in vAttrToTransfer :
+		try :
+			for i in range(nbPart) :
+				attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,array=True)
+				cmds.particle(e=True,at=attr,order=i,vv=[attrValue[0],attrValue[1],attrValue[2]])
+		except :
+			cmds.warning('Could not Transfer attribute : '+attr)
 
 
-	# // On recupere le nom de la shape du sys de part
-	$ShpList = `listRelatives -s $hdaPartXf`;
-	string $hdaPartShp = $ShpList[0];
 
-	# // compte le nb de particules
-	$nbPart = `particle -q -ct $hdaPartXf`;
+	# Transfer double attributes
 
-	# // Creation du nouveau sys de part av le suffixe dans le nom
-	$tmp = `particle -n ($hdaPartXf+"_"+$newNameSuffixe)`;
-	$dupliPartXf = $tmp[0];
-	$dupliPartShp = $tmp[1];
 
-	# // On cree tous les attr sur le nouveau system
-	for($attr in $vectorAttrListToTransfert)
-		addAttr -ln $attr -dt vectorArray $dupliPartShp;
-		addAttr -ln ($attr+"0") -dt vectorArray $dupliPartShp;
-		# // le attr0 doit etre la valeur initiale, ca ne fonctionne pas sans la creation.
 
-	# // On remplit le nouveau sys en recuperant la pos des particules
-	for($i=0; $i<$nbPart; $i++)
-		$wPos = `getParticleAttr -at position -array true ($hdaPartShp+".pt["+$i+"]")`;
-		emit -o $dupliPartXf -pos $wPos[0] $wPos[1] $wPos[2];
+	for attr in dAttrToTransfer :
+		try :
+			for i in range(nbPart) :
+				attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,)
+				# cmds.particle
 
-	# // On transfere les attr type vector
-	for($i=0; $i<$nbPart; $i++) {
-		for($attr in $vectorAttrListToTransfert)
-			$attrValue = `getParticleAttr -at $attr -array true ($hdaPartShp+".pt["+$i+"]")`;
-			# // setParticleAttr -at $attr -vv $attrValue[0] $attrValue[1] $attrValue[2] ($dupliPartShp+".pt["+$i+"]");
-			particle -e -at $attr -order $i -vv $attrValue[0] $attrValue[1] $attrValue[2];
-'''
+
+
+
+	# Delete unwanted nodes
+	cmds.delete('toolBgeoToMaya1')
+
+	# Rename particle system and group
+	newname = 'forest_instancing_pc'
+	cmds.rename(tmp[0],newname)
+	masterGRP = 'FOREST_INSTANCING_GRP'
+	try :
+		cmds.select(masterGRP,r=True)
+	except ValueError :
+		cmds.group(newname,name=masterGRP)
+	else :
+		cmds.parent(newname,masterGRP)
+
+	# Set nucleus (yes we have to keep it for some reason)
+	cmds.setAttr('nucleus1.startFrame',fstart)
+	cmds.parent('nucleus1',masterGRP)
+
+def createInstancer(*args):
+	'''This function will create an instancer and instance the selected geometries'''
+	# Save selection to add to instancer
+	sel = cmds.ls(selection=True)
+	instancer = cmds.particleInstancer('forest_instancing_pcShape', \
+		levelOfDetail='BoundingBox',addObject=True,object=sel, \
+		scale='radiusPP', \
+		objectIndex='particleId', \
+		rotation='rgbPP')
+	# Rename instancer and group
+	instancer = cmds.rename(instancer,'forest_instancing_instancer')
+	masterGRP = 'FOREST_INSTANCING_GRP'
+	try :
+		cmds.select(masterGRP,r=True)
+	except ValueError :
+		cmds.group(instancer,name=masterGRP)
+	else :
+		cmds.parent(instancer,masterGRP)
