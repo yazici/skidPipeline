@@ -10,6 +10,7 @@ from pymel.core import *
 # ****************************************** F U N C T I O N S ******************************************
 
 def createSpeedAttribute(*args):
+	'''This will create an attribute on any object which shows its speed in kmh at current frame'''
 	sel = cmds.ls(selection=True)
 	if len(sel) != 1 :
 		cmds.warning('One object must be selected')
@@ -19,7 +20,8 @@ def createSpeedAttribute(*args):
 		cmds.expression(s="float $lastPosX = `getAttr -t (frame-1) "+sel+".tx`;\nfloat $lastPosY = `getAttr -t (frame-1) "+sel+".ty`;\nfloat $lastPosZ = `getAttr -t (frame-1) "+sel+".tz`;\n\nfloat $tempSpeed = abs (mag (<<"+sel+".translateX,"+sel+".translateY,"+sel+".translateZ>>)- mag (<<$lastPosX,$lastPosY,$lastPosZ>>) );\n\n"+sel+".speed = ((($tempSpeed/100)*24)*3.6)",ae=1,uc='all')
 		cmds.select(sel,r=True)
 
-def exportAbcRfM(*args): #Export alembic avec attributes
+def exportAbcRfM(*args):
+	'''This will open the alembic export window and include Renderman attributes'''
 	try:
 		import sys
 		rmScripts = os.path.abspath('C:/Program Files/Pixar/RenderManForMaya-22.1/scripts/rfm2/utils')
@@ -31,7 +33,8 @@ def exportAbcRfM(*args): #Export alembic avec attributes
 		import maya.utils
 		maya.utils.executeDeferred('''maya.cmds.loadPlugin('RenderMan_for_Maya.py')''')
 
-def playblastAnim(*args): #Playblast avec version
+def playblastAnim(*args):
+	'''This will make a playblast of the timeline and version it'''
 	#check if version already has playblast
 	sceneFullName = cmds.file(q=1,sn=1,shn=1)
 	videoPath = os.path.abspath(cmds.workspace(sn=True,q=True)+'/video/'+sceneFullName)
@@ -40,7 +43,9 @@ def playblastAnim(*args): #Playblast avec version
 	playblastPath = os.path.abspath(playblastPath)+'.mov'
 	playblastPath = os.path.abspath(playblastPath)
 	if os.path.isfile(playblastPath):
-		confirm = cmds.confirmDialog ( title='Playblast', message= 'A playblast already exists for this version. Do you want to replace it?', button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No' )
+		confirm = cmds.confirmDialog (title='Playblast', \
+			message= 'A playblast already exists for this version. Do you want to replace it?', \
+			button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No' )
 		if confirm == 'Yes':
 			pass
 		else:
@@ -82,7 +87,9 @@ def playblastAnim(*args): #Playblast avec version
 	mel.eval('setFocalLengthVisibility(1);') #Active longueur focale
 
 	#Playblast
-	cmds.playblast(format="qt",filename=playblastPath,forceOverwrite=True,sequenceTime=0,clearCache=1,viewer=0,showOrnaments=1,offScreen=True,fp=4,percent=100,compression="H.264",quality=100,widthHeight=[2048,858])
+	cmds.playblast(format="qt",filename=playblastPath,forceOverwrite=True, \
+		sequenceTime=0,clearCache=1,viewer=0,showOrnaments=1,offScreen=True, \
+		fp=4,percent=100,compression="H.264",quality=100,widthHeight=[2048,858])
 
 
 	#Post
@@ -103,11 +110,15 @@ def playblastAnim(*args): #Playblast avec version
 	startfile(playblastPath)
 
 def publishAnimations(riggedAssets,*args):
+	'''This will automatically backup any previously published animation, make a 
+	playblast of the timeline and export any animated asset and shot camera in the scene '''
 	cmds.loadPlugin( 'AbcExport.mll' )
 	from shutil import copyfile
 	import glob
 	end = cmds.playbackOptions(q=True,max=True)
-	confirm = cmds.confirmDialog( title='Publish Animations', message='This will replace any animation previously published for this shot \nCurrent frame range is : 1001 to %s' %end, button=['Continue','Abort'], defaultButton='Continue', cancelButton='Abort', dismissString='Abort' )
+	confirm = cmds.confirmDialog( title='Publish Animations', \
+		message='This will replace any animation previously published for this shot \nCurrent frame range is : 1001 to %s' %end, \
+		button=['Continue','Abort'], defaultButton='Continue', cancelButton='Abort', dismissString='Abort' )
 	if confirm != 'Continue':
 		pass
 	else :
