@@ -14,7 +14,8 @@ sel =  [] #create a variable with the selected object
 
 # ****************************************** F U N C T I O N S ******************************************
 
-def setObject(*args): #Mise a zero de l asset
+def setObject(*args):
+	'''This will set the selected asset to world zero'''
 	if commonTools.testSelection() == None:
 		sys.exit
 	else :
@@ -25,7 +26,8 @@ def setObject(*args): #Mise a zero de l asset
 		cmds.delete(all=True, ch=True) #delete history
 		cmds.inViewMessage( amg='Ton asset <hl>'+str(sel)+'</hl> a ete mis a zero, bro.', pos='midCenter', fade=True )
 
-def fixNormals (*arg): # Fix normal for every selected objects
+def fixNormals (*arg):
+	''' Fix normal for every selected objects'''
 	if commonTools.testSelection() == None:
 		cmds.warning('Nothing is selected')
 	else :
@@ -52,8 +54,8 @@ def duplicateNamesDialog(*args):
 		renameDuplicates(2)
 
 def renameDuplicates(action,*args):
-	# Find all objects that have the same shortname as another
-	# We can indentify them because they have | in the name
+	'''Find all objects that have the same shortname as another
+	We can indentify them because they have | in the name'''
 	import re
 	duplicates = [f for f in cmds.ls() if '|' in f]
 	if action == 1:
@@ -85,7 +87,8 @@ def renameDuplicates(action,*args):
 		for i in duplicates:
 			cmds.select(i,add=True)
 
-def selObjWithoutUV(*args): # Select every object with no UV
+def selObjWithoutUV(*args):
+	'''Select every object with no UV'''
 	ObjWithoutUV = []
 	allGeos = cmds.ls(typ="mesh")
 	for i in allGeos:
@@ -106,6 +109,9 @@ def selObjWithoutUV(*args): # Select every object with no UV
 	return ObjWithoutUV
 
 def checkDatAss(*args):
+	'''This is a general asset checker that will test everything is ready
+	for the asset to be publish (the user is free to take the warnings
+	into account or dismiss them) :'''
 	from pymel.core import *
 	import maya.OpenMaya as om
 	import fnmatch
