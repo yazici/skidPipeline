@@ -2,11 +2,11 @@
 
 import maya.cmds as cmds
 import maya.mel as mel
-import maya.utils
 from functools import partial
 import sys
 import os
 import commonTools
+from pymel.core import *
 
 # ****************************************** G L O B A L S ******************************************
 
@@ -112,7 +112,6 @@ def checkDatAss(*args):
 	'''This is a general asset checker that will test everything is ready
 	for the asset to be publish (the user is free to take the warnings
 	into account or dismiss them) :'''
-	from pymel.core import *
 	import maya.OpenMaya as om
 	import fnmatch
 	import commonTools
@@ -436,3 +435,43 @@ def backupPublishedAsset(*args):
 
 def publishAsset(*args):
 	pass
+
+def basicAssetRig(*args):
+	'''This will create a basic rig for every variation of the asset so it can be
+	used during shot layout. The controller size is set using the object bounding box'''
+	import fnmatch
+	import commonTools
+	reload(commonTools)
+
+	# 1. Test if asset is in the scene and has a correct name
+	curAsset = commonTools.currentShot()
+	correctName = '%s*:%s*_grp'%(curAsset,curAsset)
+	filtered = fnmatch.filter(cmds.ls(), correctName)
+	if not filtered :
+		wmessage = 'No matching group was found. Master group should look like : %s (where * can be replaced by anything)'%correctName
+		cmds.warning(wmessage)
+		return
+	else :
+		sel = filtered
+	
+	for var in sel:
+		# 2. Test if scene has multiple variations
+		varName, sep, rest = var.partition(':')
+
+		# 3. get bbox info
+		bbox = cmds.exactWorldBoundingBox(var)
+		averageScale = (abs(bbox[0])+abs(bbox[3])+abs(bbox[2])+abs(bbox[5]))/4
+
+		# 4. Create controlers
+		ctrl = cmds.circle()
+		cmds.setAttr(ctrl[0]+'.scaleX',averageScale)
+		cmds.setAttr(ctrl[0]+'.scaleZ',averageScale)
+		cmds.setAttr(ctrl[0]+'.scaleY',averageScale)
+		cmds.setAttr(ctrl[0]+'.rotateX',90)
+		cmds.makeIdentity(ctrl,a=True)
+		cmds.delete(ctrl,constructionHistory=True)
+		ctrl = cmds.rename(ctrl[0],varName+'_ctrl')
+		cmds.parent(var,ctrl)
+		# 5. create offsets and groups
+		off = cmds.group(ctrl,n=varName+'_off')
+		cmds.group(off,n=varName+'_master')

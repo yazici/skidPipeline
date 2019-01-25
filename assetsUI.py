@@ -60,7 +60,15 @@ def CreateUI(*args):
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.selObjWithoutUV()')
-						
+				
+
+				with frameLayout('Basic rig'):
+					with columnLayout():
+						button(l='Create basic rig for asset', \
+							c='import assetsTools; \
+							reload(assetsTools); \
+							assetsTools.basicAssetRig()')
+				
 
 				with frameLayout('Prepare for render'):
 					with columnLayout():
