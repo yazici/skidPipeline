@@ -30,10 +30,10 @@ def CreateUI(*args):
 	from rfm2.config import cfg
 	rmanversion = cfg().rfm_env['versions']['rfm']
 	print rmanversion
-	if rmanversion != "22.1" :
+	if rmanversion != "22.3" :
 		import commonTools
 		commonTools.areeeeett()
-		cmds.evalDeferred("cmds.warning('Wrong Renderman for Maya version (installed version is %s), should be 22.1')" % rmanversion)
+		cmds.evalDeferred("cmds.warning('Wrong Renderman for Maya version (installed version is %s), should be 22.3')" % rmanversion)
 	else :
 		# define template
 		template = uiTemplate(force=True)
