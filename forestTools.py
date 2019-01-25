@@ -129,10 +129,10 @@ def loadShotPoints(*args):
 
 
 
-	for attr in dAttrToTransfer :
-		try :
-			for i in range(nbPart) :
-				attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,)
+	# for attr in dAttrToTransfer :
+	# 	try :
+	# 		for i in range(nbPart) :
+	# 			attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,)
 				# cmds.particle
 
 
