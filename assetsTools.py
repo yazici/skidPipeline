@@ -148,6 +148,7 @@ def checkDatAss(*args):
 		return
 
 	# Test if scene contains duplicate names
+	duplicates = []
 	duplicates = [f for f in cmds.ls() if '|' in f]
 	if not duplicates :
 		cleanDuplicates = green
@@ -172,18 +173,19 @@ def checkDatAss(*args):
 			cleanWorldZero = green
 
 	# Test freeze scales
+	notFreezed = []
 	selAllTransforms = cmds.listRelatives(sel,ad=True,typ='transform')
 	correctScale = '[(1.0, 1.0, 1.0)]'
-	notFreezed = []
 	for i in selAllTransforms:
 		if str(cmds.getAttr('%s.scale'%i)) != correctScale:
 			notFreezed.append(i)
-	if len(notFreezed) != 0:
+	if notFreezed :
 		cleanScales = red
 	else :
 		cleanScales = green
 
 	# Test nGones
+	testClean = []
 	cmds.select(sel,r=True)
 	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };')	
 	cmdNGones = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","1","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","-1","0","0" };\')'
@@ -193,19 +195,21 @@ def checkDatAss(*args):
 		cleanNGones = green
 
 	# Test nonManifold
+	testNonMani = []
 	cmds.select(sel,r=True)
-	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
+	testNonMani = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
 	cmdNonManifold = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };\')'
-	if testClean:
+	if testNonMani:
 		cleanNonManifold = red
 	else :
 		cleanNonManifold = green
 
 	# Test Edges with zero length
+	testEdgesZero = []
 	cmds.select(sel,r=True)
-	testClean = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };')
+	testEdgesZero = mel.eval('polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };')
 	cmdEdgesZeroLength = 'mel.eval(\'polyCleanupArgList 4 { "0","2","1","0","0","0","0","0","0","1e-05","1","1e-05","0","1e-05","0","-1","0","0" };\')'
-	if testClean:
+	if testEdgesZero :
 		cleanEdgesZeroLength = red
 	else :
 		cleanEdgesZeroLength = green
