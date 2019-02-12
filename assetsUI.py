@@ -40,7 +40,7 @@ def CreateUI(*args):
 			with columnLayout():
 				with frameLayout('Prepare geometries'):
 					with columnLayout():
-						button(label = 'CHECK DAT ASS(ET)', \
+						button(label = 'Asset Checker', \
 							c='import assetsTools; \
 							reload(assetsTools); \
 							assetsTools.checkDatAss()')

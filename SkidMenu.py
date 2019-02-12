@@ -8,6 +8,8 @@ def createMenu():
 	gMainWindow = mel.eval('$temp1 = $gMainWindow')
 	SkidToolsMenu = cmds.menu(parent = gMainWindow, label = "Skid Tools")
 	
+	# UTILS
+	cmds.menuItem(bld=True,l='UTILS')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Increment and Save", \
 		image='SkidMenu_versionUp.png', \
 		c='import commonTools; \
@@ -18,6 +20,10 @@ def createMenu():
 		c='import CompactRenamer as ComRen; \
 		MCCR = ComRen.MainClassCompactRenamer(); \
 		MCCR.comRenUI()')
+
+	# ASSETS
+	cmds.menuItem(divider=True)
+	cmds.menuItem(bld=True,l='ASSETS')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Animation Tools", \
 		image='SkidMenu_anim.png', \
 		c='import animationUI; \
@@ -33,19 +39,28 @@ def createMenu():
 		c='import lookdevUI; \
 		reload(lookdevUI); \
 		lookdevUI.CreateUI()')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools", \
-		image='SkidMenu_previz.png', \
-		c='import previzUI; \
-		reload(previzUI); \
-		previzUI.CreateUI()')
+	# cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools", \
+	# 	image='SkidMenu_previz.png', \
+	# 	c='import previzUI; \
+	# 	reload(previzUI); \
+	# 	previzUI.CreateUI()')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Rigging Tools", \
 		image='SkidMenu_rig.png', en=False)
+
+	# SHOTS
+	cmds.menuItem(divider=True)
+	cmds.menuItem(bld=True,l='SHOTS')
+	cmds.menuItem(parent=SkidToolsMenu, label="Set Dress Tools", \
+		image='SkidMenu_setDress.png', \
+		c='import setDressUI; \
+		reload(setDressUI)')
+	cmds.menuItem(parent=SkidToolsMenu, label="Forest Tools", \
+		image='SkidMenu_forest.png', \
+		c='import forestUI; \
+		reload(forestUI)')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Render Tools", \
 		image='SkidMenu_render.png',
 		c='import renderUI; \
 		reload(renderUI); \
 		renderUI.CreateUI()',en=False)
-	cmds.menuItem(parent=SkidToolsMenu, label="Forest Tools", \
-		image='SkidMenu_forest.png', \
-		c='import forestUI; \
-		reload(forestUI)')
+	
