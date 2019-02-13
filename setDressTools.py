@@ -48,6 +48,12 @@ def writeCasting():
 	scenePath = scenePath.replace(os.sep, '/')
 	sceneName = os.path.split(scenePath)[1]
 
+	atomFile = scenePath+'/data/'+sceneName+'.atom'
+	if not os.path.isfile(atomFile):
+		print('Could not find: '+atomFile)
+		cmds.warning('Could not find atom file for shot')
+		return
+
 	message = 'You are about to publish a shot casting for ' + sceneName + ' . this will backup and replace any previously published casting.'
 	confirm = cmds.confirmDialog(title='Publish shot casting',message=message, button=['Continue','Cancel'], \
 		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
@@ -113,9 +119,23 @@ def writeCasting():
 			f.write("%s\n" % item)
 		f.close()
 
+	# 11. .atom file modifications
+	# list sets to blast namespaces
+	namesSpaces = []
+	for f in os.listdir('//Merlin/3d4/skid/04_asset/set'):
+		f = f+':'
+		namesSpaces.append(f)
+	# Search and replace every possible namespace in atom file
+	for ns in namesSpaces:
+		# Read in the file
+		with open(atomFile, 'r') as file :
+			filedata = file.read()
+		# Replace the target string
+		filedata = filedata.replace(ns,'')
+		# Write the file out again
+		with open(atomFile, 'w') as file:
+			file.write(filedata)
+
 	# 11. Inview message
-	print('\n.cast file : ')
-	print(castFile)
-	print('\nbackup .cast file : ')
-	print(backupFile)
+	print('\n// Result: '+castFile+' //')
 	cmds.inViewMessage(amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'.cast</hl>',pos='midCenter',fade=True)

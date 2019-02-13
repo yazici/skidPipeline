@@ -31,19 +31,46 @@ def CreateUI(*args):
 		except RuntimeError :
 			pass
 
-		with window('renderWindow', title='Previz Tools',menuBar=True,menuBarVisible=True) as win:
+		with window('renderWindow', title='Render Tools',menuBar=True,menuBarVisible=True) as win:
 				with template:
 					with columnLayout():
 						with frameLayout('Prepare Scene'):
 							with columnLayout():
-								button(label='Import shot alembics',w=300,h=50,c='import previzTools; reload(previzTools); previzTools.importShotAlembics()')
-								button(label='Import shaders for alembics',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.importShaders()')
-								button(label='Assign shaders',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.assignShaders()')
-								button(label='Import Alembic as Reference',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.referenceAlembic()')
-								button(label='Set Frame Range From Camera',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.setShot()')
-								button(label='Publish shot',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.publishShot()',en=False)
+								# button(label='Import shot alembics',w=300,h=50,c='import previzTools; reload(previzTools); previzTools.importShotAlembics()')
+								# button(label='Import shaders for alembics',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.importShaders()')
+								# button(label='Assign shaders',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.assignShaders()')
+								# button(label='Publish shot',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.publishShot()',en=False)
+								button(l='Import shot camera', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.importShotCamera()')
+								button(l='Set Frame Range From Camera', \
+									c='import previzTools;  \
+									reload(previzTools); \
+									previzTools.setShot()')
+								button(l='Import shot casting', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.importCast()')
+								button(l='Import Alembic as Reference', \
+									c='import previzTools; \
+									reload(previzTools); \
+									previzTools.referenceAlembic()')
+								
+								
+						
 						with frameLayout('Rendering'):
 							with columnLayout():
 								button(l='Load Render Settings for PathTracer',c='import commonTools; reload(commonTools); commonTools.loadRenderSettings("%s")' %pathTracerPreset,en=False)
 								button(l='Load Render Settings for Unified',c='import commonTools; reload(commonTools); commonTools.loadRenderSettings("%s")' %unifiedPreset,en=False)
+
+						with frameLayout('Nomenclatures'):
+							with columnLayout():
+								button(label='Nomenclatures',h=30, \
+									c='import commonTools; \
+									reload(commonTools); \
+									commonTools.showNomenclatures()')
+
+
+								
 CreateUI()
