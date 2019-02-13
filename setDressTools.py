@@ -2,6 +2,7 @@
 
 import maya.cmds as cmds
 import os,shutil,datetime
+import commonTools
 
 referenceNodes = cmds.ls(type='reference')
 
@@ -43,6 +44,16 @@ def loadSelected():
 		cmds.file(referenceNode=n,loadReference=True)
 
 def writeCasting():
+	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+	scenePath = scenePath.replace(os.sep, '/')
+	sceneName = os.path.split(scenePath)[1]
+
+	message = 'You are about to publish a shot casting for ' + sceneName + ' . this will backup and replace any previously published casting.'
+	confirm = cmds.confirmDialog(title='Publish shot casting',message=message, button=['Continue','Cancel'], \
+		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
+	if confirm != 'Continue':
+		return
+
 	# 1. Lister tout les nodes dans le groupe SETDRESS_GRP
 	nodes = cmds.listRelatives('SETDRESS_GRP',ad=True)
 
@@ -54,47 +65,40 @@ def writeCasting():
 		except RuntimeError :
 			pass
 
-	# Delete duplicates
+	# 3. Delete duplicates
 	rn = list(dict.fromkeys(rn))
 	
-	# blasts sets
+	# 4. Blast sets
 	for n in rn:
 		if not ':' in n :
 			rn.remove(n)
 
-	# Fetch filename from reference nodes
+	# 5. Fetch filename from parent reference nodes
 	rf = []
 	for n in rn:
 		try :
-			rf.append(cmds.referenceQuery(n,filename=True))
+			rf.append(cmds.referenceQuery(n,filename=True,parent=True))
 			# ,withoutCopyNumber=True
 		except RuntimeError :
 			pass
 
-	# Blast modeling-level and rig-level references
-	# for f in rf:
-	# 	typeToBlast = ['rig.ma','.abc']
-	# 	for t in typeToBlast :
-	# 		if not t in n :
-	# 			pass
-	# 		else :
-	# 			rf.remove(f)
-	res = [k for k in rf if 'rig.ma' in k]
-	print(res)
+	# 6. Blast modeling-level and rig-level references
+	toBlast = [k for k in rf if 'abc' in k] 
+	rf = list(set(rf) - set(toBlast))
+
+	toBlast = [k for k in rf if 'rig' in k] 
+	rf = list(set(rf) - set(toBlast))
 
 
-
-	# Creer dossier data et backup
-	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
-	scenePath = scenePath.replace(os.sep, '/')
+	# 7. Creer dossier data et backup
 	if not os.path.exists(scenePath+'/data/backup'):
 		os.makedirs(scenePath+'/data/backup')
 
-	# Ecrire le cast dans un fichier .cast
-	sceneName = os.path.split(scenePath)[1]
+	# 8. Ecrire le cast dans un fichier .cast
+	
 	castFile = scenePath+'/data/'+sceneName+'.cast'
 
-	# if .cast file already exists : backup and delete
+	# 9. if .cast file already exists : backup and delete
 	ts = datetime.datetime.now()
 	ts = '%s%s%s_%s%s%s'%(ts.year,ts.month,ts.day,ts.hour,ts.minute,ts.second)
 	backupFile = scenePath+'/data/backup/'+sceneName+'_'+ts+'.cast'	
@@ -103,16 +107,15 @@ def writeCasting():
 		shutil.copyfile(castFile,backupFile)
 		os.remove(castFile)
 
-	# .cast file authoring
-	
+	# 10. .cast file authoring
 	with open(castFile,'w') as f:
 		for item in rf:
 			f.write("%s\n" % item)
 		f.close()
 
-	# Inview message
+	# 11. Inview message
 	print('\n.cast file : ')
 	print(castFile)
 	print('\nbackup .cast file : ')
 	print(backupFile)
-	cmds.inViewMessage(amg='Casting has bee written to <hl>'+castFile+'</hl>',pos='midCenter',fade=True)
+	cmds.inViewMessage(amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'.cast</hl>',pos='midCenter',fade=True)

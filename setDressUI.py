@@ -26,7 +26,7 @@ def CreateUI(*args):
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.unloadSelected()')
-						button(l='Write shot casting',\
+						button(l='Publish shot casting',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.writeCasting()')
