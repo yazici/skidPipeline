@@ -327,8 +327,8 @@ def checkDatAss(*args):
 						text(l='Faces with zero geometry area',bgc=cleanFacesZeroArea)
 						button(c='%s'%cmdFacesZeroArea)
 
-						text(l='UVs with zero map area',bgc=cleanUVsZeroArea)
-						button(c='%s'%cmdUVsZeroArea)
+						# text(l='UVs with zero map area',bgc=cleanUVsZeroArea)
+						# button(c='%s'%cmdUVsZeroArea)
 
 						text(l='Objects with no UV',bgc=cleanWithoutUvs)
 						button(c='import assetsTools; \

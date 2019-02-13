@@ -21,10 +21,14 @@ def CreateUI(*args):
 		with template:
 			with columnLayout():
 				with frameLayout('References'):
-					with rowColumnLayout():
+					with columnLayout():
 						button(l='Unload references from selection',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.unloadSelected()')
+						button(l='Write shot casting',\
+							c='import setDressTools; \
+							reload(setDressTools); \
+							setDressTools.writeCasting()')
 
 CreateUI()
