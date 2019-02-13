@@ -62,5 +62,5 @@ def createMenu():
 		image='SkidMenu_render.png',
 		c='import renderUI; \
 		reload(renderUI); \
-		renderUI.CreateUI()',en=False)
+		renderUI.CreateUI()')
 	
