@@ -44,6 +44,8 @@ def loadSelected():
 		cmds.file(referenceNode=n,loadReference=True)
 
 def writeCasting():
+	'''This will write a file containing all the file path of the reference assets for this shot
+	and their respective namespace'''
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	scenePath = scenePath.replace(os.sep, '/')
 	sceneName = os.path.split(scenePath)[1]
