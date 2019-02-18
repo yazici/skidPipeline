@@ -51,7 +51,7 @@ def CreateUI(*args):
 								button(l='Import shot casting', \
 									c='import renderTools; \
 									reload(renderTools); \
-									renderTools.importCast()')
+									renderTools.readCasting()')
 								button(l='Import Alembic as Reference', \
 									c='import previzTools; \
 									reload(previzTools); \
