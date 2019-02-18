@@ -137,3 +137,12 @@ def loadRenderSettings(context,*args): # Argument must be json file name
 	except EnvironmentError:
 		commonTools.areeeeett()
 		cmds.warning('File '+context+'.json does not exist')
+
+def initCam():
+	cam = cmds.ls(type='camera')
+	for c in cam:
+		try :
+			cmds.setAttr(c+'.nearClipPlane',10)
+			cmds.setAttr(c+'.farClipPlane',1000000)
+		except :
+			pass
