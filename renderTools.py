@@ -10,32 +10,69 @@ import commonTools,os
 
 # ****************************************** F U N C T I O N S ******************************************
 
-def importCast():
+def readCasting():
+	'''This will read the cast file for the current shot and import'''
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	scenePath = scenePath.replace(os.sep, '/')
-	sceneName = os.path.split(scenePath)[1]
-	castFile = scenePath+'/data/'+sceneName+'.cast'
+	shotName = os.path.split(scenePath)[1]
+	castFile = scenePath+'/data/'+shotName+'.cast'
 
-	message = 'Import shot casting for ' + sceneName + ' ? (This can take some time)'
-	confirm = cmds.confirmDialog(title='Publish shot casting',message=message, button=['Import','Open cast file','Cancel'], \
-		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
-	if confirm == 'Cancel':
+	# Load ATOM plugin
+	cmds.loadPlugin('atomImportExport.mll')
+
+	# Test if cast file exists
+	if not os.path.exists(castFile):
+		cmds.warning('Cast file does not exist for this shot. Should be : '+castFile)
 		return
-	elif confirm == 'Open cast file':
-		openCastFile(castFile)
+
+	# Test if atom file exists
+	atomFile = scenePath+'/data/'+shotName+'.atom'
+	if not os.path.isfile(atomFile):
+		cmds.warning('Atom file does not exist for this shot. Should be : '+atomFile)
 		return
-	
-	# read castFile and put every line in a list
+
+	# User prompt before import
 	with open(castFile) as f:
-		fileList = f.readlines()
-		fileList = [x.strip() for x in fileList]
+		for i, l in enumerate(f):
+			pass
+	lines = i+1
+	message = 'You are about to import the shot casting which contains %s assets. This will take some time, consider heading to the nearest coffee machine. Continue ?'%lines
+	confirm = cmds.confirmDialog(title='Import shot casting',message=message, button=['Continue','Cancel'], \
+		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
+	if confirm != 'Continue':
+		return
 
-	# if list contains bracket, set namespace
-	# for f in fileList:
-	toBlast = [k for k in rf if '{' in k]
+	# Read file
+	with open(castFile) as f:
+		cast = f.readlines()
+		cast = [x.strip() for x in cast]
+	f.close()
 
+	# Create group
+	masterGrp = cmds.group(em=True,name='importedCasting_grp')
 
+	# Deduce file path and namespace
+	ctrls = []
+	for l in cast:
+		l = l.split('.ma')
+		asset = l[0]+'.ma'
+		import re
+		ns = os.path.split(l[0])[1]+re.sub('[^0-9]','',l[1])
 
+		# Reference file
+		print('// Importing : '+asset+' with namespace : '+ns+' //')
+		cmds.file(asset,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=ns,returnNewNodes=True)
+		master = os.path.split(l[0])[1]
+		master = ns+':'+master+'_rig:'+master+'_master'
+		cmds.parent(master,masterGrp)
+
+		# Apply ATOM transforms
+		ctrls.append(ns+':'+os.path.split(l[0])[1]+'_rig:'+os.path.split(l[0])[1]+'_ctrl')
+	# cmds.select(ctrls,r=True)
+	cmds.select(clear=True)
+	for ctrl in ctrls :
+		cmds.select(ctrl,add=True)
+	mel.eval('file -import -type "atomImport" -ra true -namespace "%s" -options ";;targetTime=3;option=insert;match=string;;selected=selectedOnly;search=;replace=;prefix=;suffix=;mapFile=%s;" "%s";'%(ns,scenePath+'/data/',atomFile))
 
 
 def openCastFile(castFile):
