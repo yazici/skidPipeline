@@ -20,6 +20,9 @@ def readCasting():
 	# Load ATOM plugin
 	cmds.loadPlugin('atomImportExport.mll')
 
+	# Init cameras
+	commonTools.initCam()
+
 	# Test if cast file exists
 	if not os.path.exists(castFile):
 		cmds.warning('Cast file does not exist for this shot. Should be : '+castFile)
@@ -37,8 +40,10 @@ def readCasting():
 			pass
 	lines = i+1
 	message = 'You are about to import the shot casting which contains %s assets. This will take some time, consider heading to the nearest coffee machine. Continue ?'%lines
-	confirm = cmds.confirmDialog(title='Import shot casting',message=message, button=['Continue','Cancel'], \
+	confirm = cmds.confirmDialog(title='Import shot casting',message=message, button=['Continue','Open .cast file','Cancel'], \
 		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
+	if confirm == 'Open .cast file':
+		openCastFile(castFile)
 	if confirm != 'Continue':
 		return
 
