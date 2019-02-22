@@ -21,7 +21,7 @@ def readCasting():
 	cmds.loadPlugin('atomImportExport.mll')
 
 	# Init cameras
-	commonTools.initCam()
+	# commonTools.initCam()
 
 	# Test if cast file exists
 	if not os.path.exists(castFile):
@@ -69,14 +69,20 @@ def readCasting():
 		cmds.file(asset,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=ns,returnNewNodes=True)
 		master = os.path.split(l[0])[1]
 		master = ns+':'+master+'_rig:'+master+'_master'
-		cmds.parent(master,masterGrp)
+		try :
+			cmds.parent(master,masterGrp)
+		except ValueError :
+			cmds.warning('Could not parent master : '+master)
 
 		# Apply ATOM transforms
 		ctrls.append(ns+':'+os.path.split(l[0])[1]+'_rig:'+os.path.split(l[0])[1]+'_ctrl')
 	# cmds.select(ctrls,r=True)
 	cmds.select(clear=True)
 	for ctrl in ctrls :
-		cmds.select(ctrl,add=True)
+		try :
+			cmds.select(ctrl,add=True)
+		except ValueError :
+			pass
 	mel.eval('file -import -type "atomImport" -ra true -namespace "%s" -options ";;targetTime=3;option=insert;match=string;;selected=selectedOnly;search=;replace=;prefix=;suffix=;mapFile=%s;" "%s";'%(ns,scenePath+'/data/',atomFile))
 
 

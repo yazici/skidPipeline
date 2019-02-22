@@ -20,7 +20,7 @@ def createMenu():
 		c='import CompactRenamer as ComRen; \
 		MCCR = ComRen.MainClassCompactRenamer(); \
 		MCCR.comRenUI()')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Init cameras", \
+	cmds.menuItem(parent = SkidToolsMenu, label = "Debug", \
 		image='SkidMenu_cam.png', \
 		c='import commonTools; \
 		reload(commonTools); \

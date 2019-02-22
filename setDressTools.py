@@ -140,4 +140,5 @@ def writeCasting():
 
 	# 11. Inview message
 	print('\n// Result: '+castFile+' //')
-	cmds.inViewMessage(amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'.cast</hl>',pos='midCenter',fade=True)
+	cmds.inViewMessage(amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'.cast</hl>', \
+		pos='midCenter',fade=True)

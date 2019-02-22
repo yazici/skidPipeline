@@ -20,15 +20,42 @@ def CreateUI(*args):
 	with window('setDressWindow', title='Set Dress Tools',menuBar=True,menuBarVisible=True) as win:
 		with template:
 			with columnLayout():
+
+				with frameLayout('Prepare Scene'):
+					with columnLayout():
+						button(l='Import shot camera', \
+							c='import renderTools; \
+							reload(renderTools); \
+							renderTools.importShotCamera()')
+						button(l='Set Frame Range From Camera', \
+							c='import previzTools;  \
+							reload(previzTools); \
+							previzTools.setShot()')
+						button(l='Import Alembic as Reference', \
+							c='import previzTools; \
+							reload(previzTools); \
+							previzTools.referenceAlembic()')
+
+
 				with frameLayout('References'):
 					with columnLayout():
 						button(l='Unload references from selection',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.unloadSelected()')
+						button(l='Atom Export',\
+							c='mel.eval("performExportAnim 1;")')
 						button(l='Publish shot casting',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.writeCasting()')
+
+
+				with frameLayout('Nomenclatures'):
+					button(l='Afficher nomenclatures', \
+						c='import commonTools; \
+						reload(commonTools); \
+						commonTools.showNomenclatures()')
+
 
 CreateUI()

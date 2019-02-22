@@ -1,6 +1,7 @@
 # ****************************************** S K I D     C O M M O N     T O O L S ******************************************
 
 import maya.cmds as cmds
+import maya.mel as mel
 import datetime
 import os
 import sys
@@ -146,3 +147,9 @@ def initCam():
 			cmds.setAttr(c+'.farClipPlane',1000000)
 		except :
 			pass
+	try:
+		mel.eval('deleteUI unifiedRenderGlobalsWindow;')
+	except RuntimeError :
+		pass
+	
+	mel.eval('buildNewSceneUI;')

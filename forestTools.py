@@ -61,7 +61,7 @@ def loadShotPoints(*args):
 	currentShot = str(os.path.split(currentWorkspace)[1])
 	bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
 	if not os.path.isfile(bgeoPath):
-		print('Point cloud not found for %s'%currentShot)
+		cmds.warning('Point cloud not found for %s'%currentShot)
 		return
 
 	# Set persp far clip plane
