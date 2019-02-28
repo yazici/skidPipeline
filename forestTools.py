@@ -10,13 +10,13 @@ import os, subprocess
 
 # ****************************************** F U N C T I O N S ******************************************
 
-def fireHoudini(mtop,mright,mbot,mleft,*args):
+def fireHoudini(mtop,mright,mbot,mleft,depth,*args):
 	'''This function opens a headless version of houdini and computes
 	a point cloud for trees instancing depending on the shot camera position and movements.
 	Arguments are camera frustrum margins and should be a float between 0 and 1'''
 	
 	# User prompt before firing up
-	confirmTxt = 'This process can take some minutes. Please check your frame range and margins are right before you continue.'
+	confirmTxt = 'Please check your frame range and margins are right before you continue.'
 	confirm = cmds.confirmDialog(title='Compute point cloud',message=confirmTxt,button=['Continue','Cancel'], \
 		defaultButton='Continue',cancelButton='Cancel',dismissString='Cancel')
 	if confirm != 'Continue':
@@ -29,10 +29,10 @@ def fireHoudini(mtop,mright,mbot,mleft,*args):
 	fend = cmds.playbackOptions(aet=True,q=True)
 	# Fire headless Houdini 
 	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
-	print(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft)
+	print(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft,depth)
 	# os.system('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
 	# os.system('hython //Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py')
-	subprocess.call('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
+	subprocess.call('hython %s %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft,depth))
 
 def loadHoudiniEngine(*args):
 	# Load Houdini Engine for Maya and check if version is at least 17
@@ -72,7 +72,7 @@ def loadShotPoints(*args):
 	cmds.currentTime(fstart)
 
 	# Load the bgeo importer
-	toolBgeoToMaya = os.path.abspath('//merlin/3d4/skid/04_asset/hda/toolBgeoToMaya.hda')
+	toolBgeoToMaya = os.path.abspath('//merlin/3d4/skid/04_asset/hda/toolBgeoToMaya_v2.hdanc')
 	cmds.houdiniAsset(la=[toolBgeoToMaya,'Object/toolBgeoToMaya'])
 	# Set file path to shot points
 	cmds.setAttr('toolBgeoToMaya1.houdiniAssetParm.houdiniAssetParm_file',bgeoPath,type="string")

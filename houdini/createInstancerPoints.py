@@ -11,6 +11,7 @@ mtop = float(sys.argv[4]) # Margin top
 mright = float(sys.argv[5]) # Margin right
 mbot = float(sys.argv[6]) # Margin bot
 mleft = float(sys.argv[7]) # Margin left
+depth = float(sys.argv[8]) # Depth
 
 # Convert margins to houdini values
 mright += 1
@@ -26,6 +27,7 @@ print('mtop : ',mtop,type(mtop))
 print('mright : ',mright,type(mright))
 print('mbot : ',mbot,type(mbot))
 print('mleft : ',mleft,type(mleft))
+print('depth : ',depth,type(depth))
 
 
 # 1. Load scene containing setGleitenstrassen, toolCamImport
@@ -52,15 +54,18 @@ print('Camera imported succesfully')
 
 
 # 3. Set up volume parameters
-# Set camera path
-volumePath = '/obj/setGleitenstrasse1/export_to_Maya/export_shot_scatterPoints_to_maya/volume2/'
-camPath = '%sshotCamera/%s/%sShape'%(cam,currentShot,currentShot)
-hou.parm(volumePath+'camera').set(camPath)
+volumePath = '/obj/instance_pointClouds_GEO/volume1/'
+# Set camera fetch transform
+fetchPath = '/obj/CameraImport1/fetch1/'
+hou.parm(fetchPath + 'fetchobjpath').set('../shotCamera/'+str(currentShot))
+# camPath = '%sshotCamera/%s/%sShape'%(cam,currentShot,currentShot)
+# hou.parm(volumePath+'camera').set(camPath)
 # Set margins
 hou.parm(volumePath+'winxmin').set(str(mleft))
 hou.parm(volumePath+'winxmax').set(str(mright))
 hou.parm(volumePath+'winymin').set(str(mbot))
 hou.parm(volumePath+'winymax').set(str(mtop))
+hou.parm(volumePath+'zmax').set(str(depth))
 print('Volume setup done')
 
 
@@ -72,7 +77,7 @@ print('Frame range set to : %s - %s'%(fstart,fend))
 
 
 # 5. Filecache
-fcPath = '/obj/setGleitenstrasse1/export_to_Maya/export_shot_scatterPoints_to_maya/fc_pointsToMaya/'
+fcPath = '/obj/instance_pointClouds_GEO/fc_pointsToMaya/'
 bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
 hou.parm(fcPath+'file').set(str(bgeoPath))
 print('Caching instancer points to : '+bgeoPath)

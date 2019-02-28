@@ -14,9 +14,10 @@ def call_fireHoudini(*_):
 	Vright = floatSliderGrp(mright, q=True, v=True)
 	Vbot = floatSliderGrp(mbot,q=True,v=True)
  	Vleft= floatSliderGrp(mleft,q=True,v=True)
+ 	Vdepth = floatSliderGrp(depth,q=True,v=True)
  	import forestTools
  	reload(forestTools)
- 	forestTools.fireHoudini(Vtop,Vright,Vbot,Vleft)
+ 	forestTools.fireHoudini(Vtop,Vright,Vbot,Vleft,Vdepth)
 
 # ****************************************** I N T E R F A C E ******************************************
 
@@ -40,7 +41,8 @@ with window(forestWindow, title='Forest Tools',menuBar=True,menuBarVisible=True)
 					mtop = floatSliderGrp(l='Margin top')
 					mright = floatSliderGrp(l='Margin right')
 					mbot = floatSliderGrp(l='Margin bottom')
-					mleft = floatSliderGrp(l='Margin left')				
+					mleft = floatSliderGrp(l='Margin left')
+					depth = floatSliderGrp(l='Depth (m)',min=100,max=2000,s=10,v=500)
 					b = cmds.button('Compute point cloud')
 					button(b, e=True, c=call_fireHoudini)
 			
