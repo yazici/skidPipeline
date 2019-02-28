@@ -125,9 +125,9 @@ def importAssetMa(asset,*args):
 		assetType = 'character'
 	else :
 		areeeeett()
-		sys.exit()
+		return
 	
-	resolvePath = os.path.join(assetPath,assetType,asset,asset+'.ma')
+	resolvePath = os.path.join(assetPath,assetType,asset,asset+'_rig.ma')
 	cmds.file(resolvePath,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=asset)
 
 def loadRenderSettings(context,*args): # Argument must be json file name
