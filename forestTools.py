@@ -56,7 +56,7 @@ def loadShotPoints(*args):
 	if loadHoudiniEngine() == False:
 		return
 
-	# Check if point cloud exists
+	# Check if point bgeo file exists
 	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
 	currentShot = str(os.path.split(currentWorkspace)[1])
 	bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
@@ -84,59 +84,46 @@ def loadShotPoints(*args):
 	# Duplicate point cloud to get rid of houdini engine
 	pointCloud = 'file_bgeoToMaya_0'
 	pointCloud_s = pointCloud+'Shape'
-	vAttrToTransfer = ['rgbPP','radiusPP']
-	dAttrToTransfer = ['particleId']
-	newNameSuffix = '_dupli'
 
 	# Get particle count
 	nbPart = cmds.particle(pointCloud,q=True,ct=True)
 
 	# Create new particle system with suffix
-	tmp = cmds.particle(n=pointCloud+newNameSuffix)
+	tmp = cmds.particle(n=pointCloud+'_dupli')
 	dupliPartXf = tmp[0]
 	dupliPartShp = tmp[1]
 
-	# Create vector attributes on the new system
-	for attr in vAttrToTransfer:
-		try :
-			cmds.addAttr(dupliPartShp,ln=attr,dt='vectorArray')
-		except RuntimeError :
-			cmds.warning('Cant create attribute %s'%attr)
-		try :
-			cmds.addAttr(dupliPartShp,ln=attr+'0',dt='vectorArray')
-		except RuntimeError :
-			cmds.warning('Cant create attribute '+attr+'0')
-		# L'attr0 doit etre la valeur initiale, ca ne fonctionne pas sans la creation
 	cmds.setAttr(dupliPartShp+'.isDynamic',False)
 
+	# Create rgbPP attribute on the new system
+	cmds.addAttr(dupliPartShp,ln='rgbPP',dt='vectorArray')
+	cmds.addAttr(dupliPartShp,ln='rgbPP0',dt='vectorArray')
+	# Create radiusPP attribute
+	cmds.addAttr(dupliPartShp,ln='radiusPP',dt='doubleArray')
+	cmds.addAttr(dupliPartShp,ln='radiusPP0',dt='doubleArray')
+	# Create index attribute
+	cmds.addAttr(dupliPartShp,ln='index',dt='doubleArray')
+	cmds.addAttr(dupliPartShp,ln='index0',dt='doubleArray')
+	
 	# Fill new particle system with positions
-	for i in range(nbPart):
+	for i in range(nbPart) :
 		wPos = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at='position',array=True)
 		cmds.emit(o=dupliPartXf,pos=[wPos[0],wPos[1],wPos[2]])
 
-	# Transfer vector attributes
-	for attr in vAttrToTransfer :
-		try :
-			for i in range(nbPart) :
-				attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,array=True)
-				cmds.particle(e=True,at=attr,order=i,vv=[attrValue[0],attrValue[1],attrValue[2]])
-		except :
-			cmds.warning('Could not Transfer attribute : '+attr)
-
-
-
-	# Transfer double attributes
-
-
-
-	# for attr in dAttrToTransfer :
-	# 	try :
-	# 		for i in range(nbPart) :
-	# 			attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at=attr,)
-				# cmds.particle
-
-
-
+	# Transfer rgbPP
+	for i in range(nbPart) :
+		attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at='rgbPP',array=True)
+		cmds.particle(e=True,at='rgbPP',order=i,vectorValue=[attrValue[0],attrValue[1],attrValue[2]])
+	
+	# Transfer radiusPP
+	for i in range(nbPart) :
+		attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at='radiusPP',array=True)
+		cmds.particle(e=True,at='radiusPP',order=i,floatValue=attrValue[0])
+	
+	# Transfer index
+	for i in range(nbPart) :
+		attrValue = cmds.getParticleAttr('%s.pt[%s]'%(pointCloud_s,i),at='index',array=True)
+		cmds.particle(e=True,at='index',order=i,floatValue=attrValue[0])
 
 	# Delete unwanted nodes
 	cmds.delete('toolBgeoToMaya1')
