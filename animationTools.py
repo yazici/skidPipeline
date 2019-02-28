@@ -169,3 +169,41 @@ def publishAnimations(riggedAssets,*args):
 		command = "-frameRange " + start + " " + end +" -attrPrefix rman__torattr -attrPrefix rman__riattr -attrPrefix rman_emitFaceIDs -stripNamespaces -uvWrite -writeColorSets -writeFaceSets -worldSpace -writeVisibility -eulerFilter -autoSubd -writeUVSets -dataFormat ogawa -root " + root + " -file " + save_name
 		cmds.AbcExport(j=command)
 		print '%s has been exported successfuly (probably)' %commonTools.currentShot()
+
+def constraintCar(asset,*args):
+	constraints = ['FR','FL','RR','RL']
+	attrList = [ \
+	asset+':CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
+	asset+':CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
+	asset+':CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
+	asset+':CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
+	sel = cmds.ls(selection=True)
+
+	if len(sel) != 1:
+		cmds.warning('More than one object is selected')
+		return
+
+	sel = cmds.listRelatives(sel,shapes=True)
+	
+	for attr in attrList :
+		cmds.setAttr(attr,1)
+
+	for const in constraints :
+		cmds.select(asset + ':Fit_to_ground_'+const+'_offset',add=True)
+		cmds.geometryConstraint(weight=1)
+		cmds.select(asset + ':Fit_to_ground_'+const+'_offset',tgl=True)
+
+	cmds.setAttr(sel[0]+'.visibility',0)
+
+def toggleConstraintCar(asset,*args):
+	attrList = [ \
+	asset+':CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
+	asset+':CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
+	asset+':CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
+	asset+':CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
+
+	for attr in attrList :
+		if cmds.getAttr(attr) == 0 :
+			cmds.setAttr(attr,1)
+		else :
+			cmds.setAttr(attr,0)
