@@ -10,7 +10,7 @@ import os, subprocess
 
 # ****************************************** F U N C T I O N S ******************************************
 
-def fireHoudini(mtop,mright,mbot,mleft,depth,*args):
+def fireHoudini(focalLength,mtop,mright,mbot,mleft,depth,*args):
 	'''This function opens a headless version of houdini and computes
 	a point cloud for trees instancing depending on the shot camera position and movements.
 	Arguments are camera frustrum margins and should be a float between 0 and 1'''
@@ -29,10 +29,10 @@ def fireHoudini(mtop,mright,mbot,mleft,depth,*args):
 	fend = cmds.playbackOptions(aet=True,q=True)
 	# Fire headless Houdini 
 	houScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py'
-	print(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft,depth)
+	print(houScript,currentShot,fstart,fend,focalLength,mtop,mright,mbot,mleft,depth)
 	# os.system('hython %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft))
 	# os.system('hython //Merlin/3d4/skid/09_dev/toolScripts/publish/houdini/createInstancerPoints.py')
-	subprocess.call('hython %s %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft,depth))
+	subprocess.call('hython %s %s %s %s %s %s %s %s %s %s'%(houScript,currentShot,fstart,fend,mtop,mright,mbot,mleft,depth,focalLength))
 
 def loadHoudiniEngine(*args):
 	# Load Houdini Engine for Maya and check if version is at least 17
@@ -144,14 +144,41 @@ def loadShotPoints(*args):
 	cmds.parent('nucleus1',masterGRP)
 
 def createInstancer(*args):
-	'''This function will create an instancer and instance the selected geometries'''
-	# Save selection to add to instancer
-	sel = cmds.ls(selection=True)
-	instancer = cmds.particleInstancer('forest_instancing_pcShape', \
-		levelOfDetail='BoundingBox',addObject=True,object=sel, \
+	'''This function will import every asset needed for instancing
+	and create an instancer with index binding'''
+
+	propsPath = '//merlin/3d4/skid/04_asset/props/'
+	''' The following assets must be in the same order that was specified in Houdini
+	First line corresponds to index 0, next line index 1 and so on...'''
+	toImport = [ \
+	'propsPine/propsPine_A.ma', \
+	'propsGrass/propsGrass_A_clean.ma', \
+	'propsGrass/propsGrass_B_clean.ma', \
+	'propsGrass/propsGrass_C_clean.ma', \
+	]
+
+	# Import assets
+	for asset in toImport :
+		resolvePath = propsPath + asset
+		cmds.file(resolvePath,reference=True,type='mayaAscii',ignoreVersion=True)
+
+	toInstance = [ \
+	'propsPine_A_rig:propsPine_A_master', \
+	'propsGrass_A_clean_rig:propsGrass_A_clean_master', \
+	'propsGrass_B_clean_rig:propsGrass_B_clean_master', \
+	'propsGrass_C_clean_rig:propsGrass_C_clean_master', \
+	]
+
+	sel = cmds.select(toInstance,r=True)
+
+	# Creating the instancer with pymel seems to be more stable for some reason
+	import pymel.core as pm
+	instancer = pm.effects.particleInstancer('forest_instancing_pcShape', \
+		levelOfDetail='BoundingBox', \
 		scale='radiusPP', \
-		objectIndex='particleId', \
+		objectIndex='index', \
 		rotation='rgbPP')
+
 	# Rename instancer and group
 	instancer = cmds.rename(instancer,'forest_instancing_instancer')
 	masterGRP = 'FOREST_INSTANCING_GRP'
@@ -161,3 +188,10 @@ def createInstancer(*args):
 		cmds.group(instancer,name=masterGRP)
 	else :
 		cmds.parent(instancer,masterGRP)
+
+	# Group instanced assets
+	instancedGRP = cmds.group(em=True,name='instanced_assets_grp')
+	for i in toInstance :
+		cmds.parent(i,instancedGRP)
+	cmds.parent(instancedGRP,masterGRP)
+	cmds.setAttr(instancedGRP+'.visibility',0)
