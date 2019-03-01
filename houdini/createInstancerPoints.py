@@ -12,6 +12,7 @@ mright = float(sys.argv[5]) # Margin right
 mbot = float(sys.argv[6]) # Margin bot
 mleft = float(sys.argv[7]) # Margin left
 depth = float(sys.argv[8]) # Depth
+focalLength = float(sys.argv[9]) # focalLength
 
 # Convert margins to houdini values
 mright += 1
@@ -28,6 +29,7 @@ print('mright : ',mright,type(mright))
 print('mbot : ',mbot,type(mbot))
 print('mleft : ',mleft,type(mleft))
 print('depth : ',depth,type(depth))
+print('focalLength : ',focalLength,type(focalLength))
 
 
 # 1. Load scene containing setGleitenstrassen, toolCamImport
@@ -50,14 +52,15 @@ if not os.path.isfile(abcPath):
 cam = '/obj/CameraImport1/'
 hou.parm(cam+'fileName').set(abcPath)
 hou.parm(cam+'buildHierarchy').pressButton()
-print('Camera imported succesfully')
+# Modify camera focal length and fetch
+hou.parm('/obj/CameraImport1/renderCam/focal').set(str(focalLength))
+# Set camera fetch transform
+fetchPath = '/obj/CameraImport1/fetch1/'
+hou.parm(fetchPath + 'fetchobjpath').set('../shotCamera/'+str(currentShot))
 
 
 # 3. Set up volume parameters
 volumePath = '/obj/instance_pointClouds_GEO/volume1/'
-# Set camera fetch transform
-fetchPath = '/obj/CameraImport1/fetch1/'
-hou.parm(fetchPath + 'fetchobjpath').set('../shotCamera/'+str(currentShot))
 # camPath = '%sshotCamera/%s/%sShape'%(cam,currentShot,currentShot)
 # hou.parm(volumePath+'camera').set(camPath)
 # Set margins
