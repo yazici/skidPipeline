@@ -10,6 +10,7 @@ forestWindow = "forestWindow"
 # ****************************************** F U N C T I O N S ******************************************
 
 def call_fireHoudini(*_):
+	VfocalLength = floatSliderGrp(focalLength,q=True,v=True)
 	Vtop = floatSliderGrp(mtop,q=True,v=True)
 	Vright = floatSliderGrp(mright, q=True, v=True)
 	Vbot = floatSliderGrp(mbot,q=True,v=True)
@@ -17,7 +18,7 @@ def call_fireHoudini(*_):
  	Vdepth = floatSliderGrp(depth,q=True,v=True)
  	import forestTools
  	reload(forestTools)
- 	forestTools.fireHoudini(Vtop,Vright,Vbot,Vleft,Vdepth)
+ 	forestTools.fireHoudini(VfocalLength,Vtop,Vright,Vbot,Vleft,Vdepth)
 
 # ****************************************** I N T E R F A C E ******************************************
 
@@ -36,8 +37,21 @@ except RuntimeError :
 with window(forestWindow, title='Forest Tools',menuBar=True,menuBarVisible=True) as win:
 	with template:
 		with columnLayout():
+			
+			with frameLayout('Camera setup'):
+				with rowColumnLayout():
+					button(l='Import shot camera', \
+						c='import renderTools; \
+						reload(renderTools); \
+						renderTools.importShotCamera()')
+					button(l='Set Frame Range From Camera', \
+						c='import previzTools;  \
+						reload(previzTools); \
+						previzTools.setShot()')
+
 			with frameLayout('Create point cloud'):
 				with rowColumnLayout():
+					focalLength = floatSliderGrp(l='Focal Length',min=5,max=300,s=1,v=50)
 					mtop = floatSliderGrp(l='Margin top')
 					mright = floatSliderGrp(l='Margin right')
 					mbot = floatSliderGrp(l='Margin bottom')
@@ -48,15 +62,15 @@ with window(forestWindow, title='Forest Tools',menuBar=True,menuBarVisible=True)
 			
 			with frameLayout('Maya instancer'):
 				with rowColumnLayout():
-					button(l='Load Houdini Engine for Maya', \
-						c='import forestTools; \
-						reload(forestTools); \
-						forestTools.loadHoudiniEngine()')
+					# button(l='Load Houdini Engine for Maya', \
+					# 	c='import forestTools; \
+					# 	reload(forestTools); \
+					# 	forestTools.loadHoudiniEngine()')
 					button(l='Load point cloud', \
 						c='import forestTools; \
 						reload(forestTools); \
 						forestTools.loadShotPoints()')
-					button(l='Create instancer for selected geometries', \
+					button(l='Scatter !', \
 						c='import forestTools; \
 						reload(forestTools); \
 						forestTools.createInstancer()')
