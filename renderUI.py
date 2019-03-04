@@ -34,12 +34,9 @@ def CreateUI(*args):
 		with window('renderWindow', title='Render Tools',menuBar=True,menuBarVisible=True) as win:
 				with template:
 					with columnLayout():
-						with frameLayout('Prepare Scene'):
+
+						with frameLayout('Importomatic'):
 							with columnLayout():
-								# button(label='Import shot alembics',w=300,h=50,c='import previzTools; reload(previzTools); previzTools.importShotAlembics()')
-								# button(label='Import shaders for alembics',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.importShaders()')
-								# button(label='Assign shaders',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.assignShaders()')
-								# button(label='Publish shot',w=300,h=30,c='import previzTools; reload(previzTools); previzTools.publishShot()',en=False)
 								button(l='Import shot camera', \
 									c='import renderTools; \
 									reload(renderTools); \
@@ -48,15 +45,48 @@ def CreateUI(*args):
 									c='import previzTools;  \
 									reload(previzTools); \
 									previzTools.setShot()')
+
+							with columnLayout():
+								button(l='Import shot animations', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.importShotAlembics()')
+								button(l='Import shaders for animations', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.importShaders()')
+								button(l='Asign shaders for animations', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.assignShaders()')
+
+							with columnLayout():
 								button(l='Import shot casting', \
 									c='import renderTools; \
 									reload(renderTools); \
 									renderTools.readCasting()')
+								button(l='Import shot forest', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.readCasting()',en=False)
+
+						with frameLayout('Import'):
+							with columnLayout():
 								button(l='Import Alembic as Reference', \
 									c='import previzTools; \
 									reload(previzTools); \
 									previzTools.referenceAlembic()')
-								
+
+						with frameLayout('Geometries'):
+							with rowLayout(numberOfColumns=2):
+									button(label='Attach Subdiv Scheme',w=149, \
+										c='import commonTools; \
+										reload(commonTools); \
+										commonTools.RfMsubdivScheme(1)')
+									button(label="Detach Subdiv Scheme",w=148, \
+										c='import commonTools; \
+										reload(commonTools); \
+										commonTools.RfMsubdivScheme(0)')		
 								
 						
 						with frameLayout('Rendering'):
