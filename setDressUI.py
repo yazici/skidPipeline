@@ -39,11 +39,15 @@ def CreateUI(*args):
 
 				with frameLayout('References'):
 					with columnLayout():
+						button(l='Load all references from selection',\
+							c='import setDressTools; \
+							reload(setDressTools); \
+							setDressTools.loadAllReferences()',en=False)
 						button(l='Unload references from selection',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.unloadSelected()')
-						button(l='Atom Export',\
+						button(l='Backup transforms to Atom file',\
 							c='mel.eval("performExportAnim 1;")')
 						button(l='Publish shot casting',\
 							c='import setDressTools; \

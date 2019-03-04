@@ -39,72 +39,54 @@ def unloadSelected():
 	for n in RNfromSelection():
 		cmds.file(referenceNode=n,unloadReference=True)
 
-def loadSelected():
-	for n in RNfromSelection():
-		cmds.file(referenceNode=n,loadReference=True)
+# def loadSelected():
+# 	for n in RNfromSelection():
+# 		cmds.file(referenceNode=n,loadReference=True)
+
+def loadAllReferences():
+	sel = cmds.ls(selection=True)
+	rn = []
+	for i in sel :
+		print(i)
+		rn.append(cmds.referenceQuery(i,filename=True))
+	for i in rn :
+		print(i)
+		cmds.file(i,force=True,reference=True,loadReferenceDepth='all')
 
 def writeCasting():
 	'''This will write a file containing all the file path of the reference assets for this shot
 	and their respective namespace'''
-	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+
+	scenePath = cmds.workspace(sn=True,q=True)
 	scenePath = scenePath.replace(os.sep, '/')
 	sceneName = os.path.split(scenePath)[1]
+	castFile = scenePath+'/data/'+sceneName+'_setDress.cast'
 
-	atomFile = scenePath+'/data/'+sceneName+'.atom'
-	if not os.path.isfile(atomFile):
-		print('Could not find: '+atomFile)
-		cmds.warning('Could not find atom file for shot')
-		return
+	# 1. Lister toutes les references dans le groupe SETDRESS_GRP
+	setDress  = cmds.listRelatives('SETDRESS_GRP',allDescendents=True)
 
-	message = 'You are about to publish a shot casting for ' + sceneName + ' . this will backup and replace any previously published casting.'
-	confirm = cmds.confirmDialog(title='Publish shot casting',message=message, button=['Continue','Cancel'], \
-		defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel')
-	if confirm != 'Continue':
-		return
-
-	# 1. Lister tout les nodes dans le groupe SETDRESS_GRP
-	nodes = cmds.listRelatives('SETDRESS_GRP',ad=True)
-
-	# 2. Fetch reference node from nodes
 	rn = []
-	for n in nodes:
+	for n in setDress:
 		try :
 			rn.append(cmds.referenceQuery(n,referenceNode=True))
 		except RuntimeError :
 			pass
 
-	# 3. Delete duplicates
+	# 3. Merge duplicates
 	rn = list(dict.fromkeys(rn))
 	
-	# 4. Blast sets
+	# 4. Blast sets	
 	for n in rn:
 		if not ':' in n :
 			rn.remove(n)
 
-	# 5. Fetch filename from parent reference nodes
-	rf = []
+	# 5. Keep only rig level references
 	for n in rn:
-		try :
-			rf.append(cmds.referenceQuery(n,filename=True,parent=True))
-			# ,withoutCopyNumber=True
-		except RuntimeError :
-			pass
-
-	# 6. Blast modeling-level and rig-level references
-	toBlast = [k for k in rf if 'abc' in k] 
-	rf = list(set(rf) - set(toBlast))
-
-	toBlast = [k for k in rf if 'rig' in k] 
-	rf = list(set(rf) - set(toBlast))
+		if not n.endswith('rigRN') :
+			rn.remove(n)
 
 
-	# 7. Creer dossier data et backup
-	if not os.path.exists(scenePath+'/data/backup'):
-		os.makedirs(scenePath+'/data/backup')
-
-	# 8. Ecrire le cast dans un fichier .cast
-	
-	castFile = scenePath+'/data/'+sceneName+'.cast'
+	# print(rn)
 
 	# 9. if .cast file already exists : backup and delete
 	ts = datetime.datetime.now()
@@ -115,30 +97,17 @@ def writeCasting():
 		shutil.copyfile(castFile,backupFile)
 		os.remove(castFile)
 
-	# 10. .cast file authoring
+	# # 10. cast file authoring
 	with open(castFile,'w') as f:
-		for item in rf:
-			f.write("%s\n" % item)
+		for i in rn :
+			namespace = str(i)
+			path = cmds.referenceQuery(i,filename=True,withoutCopyNumber=True)
+			f.write("%s %s\n" %(path,namespace))
 		f.close()
-
-	# 11. .atom file modifications
-	# list sets to blast namespaces
-	namesSpaces = []
-	for f in os.listdir('//Merlin/3d4/skid/04_asset/set'):
-		f = f+':'
-		namesSpaces.append(f)
-	# Search and replace every possible namespace in atom file
-	for ns in namesSpaces:
-		# Read in the file
-		with open(atomFile, 'r') as file :
-			filedata = file.read()
-		# Replace the target string
-		filedata = filedata.replace(ns,'')
-		# Write the file out again
-		with open(atomFile, 'w') as file:
-			file.write(filedata)
 
 	# 11. Inview message
 	print('\n// Result: '+castFile+' //')
-	cmds.inViewMessage(amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'.cast</hl>', \
-		pos='midCenter',fade=True)
+	cmds.inViewMessage( \
+		amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'_setDress.cast</hl>', \
+		pos='midCenter', \
+		fade=True)
