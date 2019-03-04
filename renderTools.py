@@ -6,7 +6,7 @@ import commonTools,os
 
 # ****************************************** G L O B A L S ******************************************
 
-
+deltaAbc = ['propsBrevell','propsWerner','propsEthanHelmet','propsAltonHelmet']
 
 # ****************************************** F U N C T I O N S ******************************************
 
@@ -85,7 +85,6 @@ def readCasting():
 			pass
 	mel.eval('file -import -type "atomImport" -ra true -namespace "%s" -options ";;targetTime=3;option=insert;match=string;;selected=selectedOnly;search=;replace=;prefix=;suffix=;mapFile=%s;" "%s";'%(ns,scenePath+'/data/',atomFile))
 
-
 def openCastFile(castFile):
 	'''This will open a window with the content of current shot casting'''
 	from functools import partial
@@ -110,3 +109,110 @@ def importShotCamera():
 		cmds.warning('No camera found, should be : '+cam)
 	else :
 		cmds.file(cam,r=True,type='Alembic',ignoreVersion=True,gl=True,ns=sceneName)
+
+def importShotAlembics(*args):
+	'''This will import the animated alembic files for the current shot'''
+	
+	abcPath = cmds.workspace(q=True,rd=True) + 'abc/'
+	toImport = []
+	for i in deltaAbc :
+		if os.path.exists(abcPath + i + '.abc') : # If animation is published...
+			if cmds.objExists(i+'RN') == True: # If already in scene continue to next abc
+				continue
+			else :
+				toImport.append(i)
+
+	if not toImport :
+		cmds.warning('No more animation to import')
+	else :
+		confirm = cmds.confirmDialog(title='Import Shot animations', \
+			message='Found '+str(len(toImport))+' animation files to import. Continue ?', \
+			button=['Continue','Cancel'], \
+			defaultButton='Continue', \
+			cancelButton='Cancel', \
+			dismissString='Cancel' )
+		if confirm == 'Continue':
+			for i in toImport:
+				resolvePath = os.path.join(abcPath,i+'.abc')
+				resolvePath = os.path.abspath(resolvePath)
+				# print resolvePath
+				cmds.file(resolvePath,r=True,type='Alembic',ignoreVersion=True,gl=True,ns=i)
+			
+
+def importShaders(*args):
+	'''This will import the corresponding shaders for the imported animations'''
+	# List imported animations except if shader is already imported
+	imported = []
+	for i in deltaAbc :
+		if cmds.objExists(i+'RN') == True and cmds.objExists(i+'_shdRN') == False :
+			imported.append(i)
+
+	# print(imported)
+
+	# Verify if shader is published
+	shdToImport = []
+	shdToImportNS = []
+	for i in imported:
+		if i.startswith('props') == True:
+			assetType = 'props'
+		elif i.startsWith('character') == True:
+			assetType = 'character'
+		else :
+			cmds.warning('Could not resolve path for '+i)
+
+		resolvePath = '//Merlin/3d4/skid/04_asset/' + assetType + '/' + i + '/' + i + '_shd.ma'
+		check = os.path.exists(resolvePath)
+
+		if not os.path.exists(resolvePath) :
+			cmds.warning('Could not find published shaders for '+i)
+		else :
+			shdToImport.append(resolvePath)
+			shdToImportNS.append(i+'_shd')
+
+	# User prompt
+	if not shdToImport :
+		cmds.warning('No more shader to import')
+	else :
+		confirm = cmds.confirmDialog(title='Import Shaders', \
+			message='Found '+str(len(shdToImport))+' shader files to import. Continue ?', \
+			button=['Continue','Cancel'], \
+			defaultButton='Continue', \
+			cancelButton='Cancel', \
+			dismissString='Cancel' )
+		if confirm == 'Continue':
+			for (i,ns) in zip(shdToImport,shdToImportNS) :
+				print('Importing : ' + i)
+				print('With namespace : '+ns)
+				cmds.file(i,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=ns)
+
+def assignShaders(*args):
+	'''This will automatically assign shaders depending on asset (based on namespace)
+	 and depending on object (based on ID)'''
+
+	# List objects with ID
+	geometries = cmds.ls("*_ID*",r=True,tr=True)
+
+	if geometries :
+		# User prompt
+		confirm = cmds.confirmDialog(title='Assign Shaders', \
+			message='Found '+str(len(geometries))+' object with ID. Continue ?', \
+			button=['Continue','Cancel'], \
+			defaultButton='Continue', \
+			cancelButton='Cancel', \
+			dismissString='Cancel' )
+
+		if confirm == 'Continue':
+			for i in geometries:
+				# On split le mot cle de l'ID
+				ID = i.split('_ID', 1)[-1]
+				# On split le namespace
+				nameSpace = i.split(':',)[0]
+				# Puis on reconstruie le nom du shading group :
+				SG = nameSpace+'_shd:'+ID+'_SG'
+				# Puis on assigne le shading group a la geo qui lui correspond
+				try :
+					cmds.sets(i,e=True,forceElement=SG)
+				except TypeError :
+					cmds.warning('Could not find matching Shading Group for '+i+', make sure your Shading Group name is : '+SG)
+	else :
+		cmds.warning('Could not find any object with ID')
