@@ -173,10 +173,10 @@ def publishAnimations(riggedAssets,*args):
 def constraintCar(asset,*args):
 	constraints = ['FR','FL','RR','RL']
 	attrList = [ \
-	asset+':CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
-	asset+':CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
-	asset+':CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
-	asset+':CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
+	asset+'_rig:CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
+	asset+'_rig:CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
+	asset+'_rig:CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
+	asset+'_rig:CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
 	sel = cmds.ls(selection=True)
 
 	if len(sel) != 1:
@@ -189,21 +189,31 @@ def constraintCar(asset,*args):
 		cmds.setAttr(attr,1)
 
 	for const in constraints :
-		cmds.select(asset + ':Fit_to_ground_'+const+'_offset',add=True)
+		cmds.select(asset + '_rig:Fit_to_ground_'+const+'_offset',add=True)
 		cmds.geometryConstraint(weight=1)
-		cmds.select(asset + ':Fit_to_ground_'+const+'_offset',tgl=True)
+		cmds.select(asset + '_rig:Fit_to_ground_'+const+'_offset',tgl=True)
 
 	cmds.setAttr(sel[0]+'.visibility',0)
 
 def toggleConstraintCar(asset,*args):
 	attrList = [ \
-	asset+':CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
-	asset+':CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
-	asset+':CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
-	asset+':CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
+	asset+'_rig:CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
+	asset+'_rig:CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
+	asset+'_rig:CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
+	asset+'_rig:CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
 
 	for attr in attrList :
 		if cmds.getAttr(attr) == 0 :
 			cmds.setAttr(attr,1)
 		else :
 			cmds.setAttr(attr,0)
+
+def poseCar(asset,*args):
+	cmds.select(asset+'_rig:CTRL',r=True)
+	cmds.file('//merlin/3d4/skid/04_asset/character/'+asset+'/data/startPose.atom',  \
+		i=True, \
+		type='atomImport', \
+		ra=True, \
+		namespace='poseCar', \
+		options=';;targetTime=3;option=scaleReplace;match=hierarchy;;selected=selectedOnly;search=;replace=;prefix=;suffix=;mapFile=;')
+	cmds.select(asset+'_rig:CTRL',r=True)

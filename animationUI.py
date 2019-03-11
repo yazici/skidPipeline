@@ -34,6 +34,11 @@ def callToggleConstraintCar(*args):
 	reload(animationTools)
 	animationTools.toggleConstraintCar(chosenRig)
 
+def callPoseCar(*args):
+	import animationTools
+	reload(animationTools)
+	animationTools.poseCar(chosenRig)
+
 # ****************************************** I N T E R F A C E ******************************************
 
 def CreateUI(*args):
@@ -66,7 +71,12 @@ def CreateUI(*args):
 						button(l='arcTracker', \
 							c='import maya.mel as mel; \
 							mel.eval(\'source "%s/arctracker110.mel"\'); \
-							mel.eval(\'arctracker110()\')' %animScriptsPath)		
+							mel.eval(\'arctracker110()\')' %animScriptsPath)
+						button(l='Studio Library', \
+							c='import studiolibrary; \
+							reload(studiolibrary); \
+							studiolibrary.main()')
+						
 
 				with frameLayout('Animation Tools'):
 					with rowColumnLayout():
@@ -76,7 +86,14 @@ def CreateUI(*args):
 								menuItem(l=asset)
 					with columnLayout():
 						button(l='Import asset',c=callImportRig)
-						button(l='Constraint asset to selected',c=callConstraintCar)
+
+				with frameLayout('Character Tools'):
+					with columnLayout():
+						button(l='Start pose !',c=callPoseCar)
+
+				with frameLayout('Car Tools'):
+					with columnLayout():
+						button(l='Constraint car to selected',c=callConstraintCar)
 						button(l='Toggle constraint',c=callToggleConstraintCar)
 
 						# button(l='Create Speed Attribute', \
