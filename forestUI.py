@@ -56,7 +56,7 @@ with window(forestWindow, title='Forest Tools',menuBar=True,menuBarVisible=True)
 					mright = floatSliderGrp(l='Margin right')
 					mbot = floatSliderGrp(l='Margin bottom')
 					mleft = floatSliderGrp(l='Margin left')
-					depth = floatSliderGrp(l='Depth (m)',min=100,max=2000,s=10,v=500)
+					depth = floatSliderGrp(l='Depth (m)',min=100,max=2000,s=10,v=200)
 					b = cmds.button('Compute point cloud')
 					button(b, e=True, c=call_fireHoudini)
 			

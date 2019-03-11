@@ -155,6 +155,9 @@ def createInstancer(*args):
 	'propsGrass/propsGrass_A_clean.ma', \
 	'propsGrass/propsGrass_B_clean.ma', \
 	'propsGrass/propsGrass_C_clean.ma', \
+	'propsFir/propsFir_A.ma', \
+	'propsFir/propsFir_B.ma', \
+	'propsFir/propsFir_C.ma', \
 	]
 
 	# Import assets
@@ -162,12 +165,19 @@ def createInstancer(*args):
 		resolvePath = propsPath + asset
 		cmds.file(resolvePath,reference=True,type='mayaAscii',ignoreVersion=True)
 
-	toInstance = [ \
-	'propsPine_A_rig:propsPine_A_master', \
-	'propsGrass_A_clean_rig:propsGrass_A_clean_master', \
-	'propsGrass_B_clean_rig:propsGrass_B_clean_master', \
-	'propsGrass_C_clean_rig:propsGrass_C_clean_master', \
-	]
+
+	# toInstance = [ \
+	# 'propsPine_A_rig:propsPine_A_master', \
+	# 'propsGrass_A_clean_rig:propsGrass_A_clean_master', \
+	# 'propsGrass_B_clean_rig:propsGrass_B_clean_master', \
+	# 'propsGrass_C_clean_rig:propsGrass_C_clean_master', \
+	# ]
+	toInstance = []
+	for i in toImport :
+		i = i.split('/')[1]
+		i = i.split('.')[0]
+		i = i + '_rig:' + i + '_master'
+		toInstance.append(i)
 
 	sel = cmds.select(toInstance,r=True)
 
@@ -194,4 +204,8 @@ def createInstancer(*args):
 	for i in toInstance :
 		cmds.parent(i,instancedGRP)
 	cmds.parent(instancedGRP,masterGRP)
-	cmds.setAttr(instancedGRP+'.visibility',0)
+	# NE PAS DESACTIVER VISIBILITY
+
+# def exportRIB(*args):
+# select -r FOREST_INSTANCING_GRP ;
+# file -force -options "rmanExportRIBFormat=1;rmanExportMultipleFrames=0;rmanExportStartFrame=1;rmanExportEndFrame=10;rmanExportByFrame=1;rmanExportRIBArchive=1;rmanExportRIBCamera=persp" -typ "RIB" -pr -es "//merlin/3d4/skid/05_shot/seq0080_sh0160/geo/seq0080_sh0160_forest.rib";	

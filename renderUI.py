@@ -5,7 +5,7 @@ from pymel.core import *
 
 # ****************************************** G L O B A L S ******************************************
 
-pathTracerPreset = '.json'
+pathTracerPreset = 'SKID_shot_PathTracer.json'
 unifiedPreset = '.json'
 
 # ****************************************** I N T E R F A C E ******************************************
@@ -68,7 +68,7 @@ def CreateUI(*args):
 								button(l='Import shot forest', \
 									c='import renderTools; \
 									reload(renderTools); \
-									renderTools.readCasting()',en=False)
+									renderTools.importForest()')
 
 						with frameLayout('Import'):
 							with columnLayout():
@@ -78,21 +78,47 @@ def CreateUI(*args):
 									previzTools.referenceAlembic()')
 
 						with frameLayout('Geometries'):
-							with rowLayout(numberOfColumns=2):
-									button(label='Attach Subdiv Scheme',w=149, \
-										c='import commonTools; \
-										reload(commonTools); \
-										commonTools.RfMsubdivScheme(1)')
-									button(label="Detach Subdiv Scheme",w=148, \
-										c='import commonTools; \
-										reload(commonTools); \
-										commonTools.RfMsubdivScheme(0)')		
+							with columnLayout() :
+								with rowLayout(numberOfColumns=2):
+										button(l='Attach Subdiv Scheme',w=149, \
+											c='import commonTools; \
+											reload(commonTools); \
+											commonTools.RfMsubdivScheme(1)')
+										button(l="Detach Subdiv Scheme",w=148, \
+											c='import commonTools; \
+											reload(commonTools); \
+											commonTools.RfMsubdivScheme(0)')
+								with rowLayout(numberOfColumns=2):
+									button(l='Inherit Trace Bias',w=149, \
+											c = 'import renderTools ; \
+											reload(renderTools) ; \
+											renderTools.autoBias(True)')
+									button(l='Divide Bias by 10',w=148, \
+											c = 'import renderTools ; \
+											reload(renderTools) ; \
+											renderTools.autoBias(False)')
+								with rowLayout(numberOfColumns=2):
+									button(l='Inherit Motion Samples',w=149, \
+											c = 'import renderTools ; \
+											reload(renderTools) ; \
+											renderTools.motionSamples(True)')
+									button(l='Add 1 motion sample',w=148, \
+											c = 'import renderTools ; \
+											reload(renderTools) ; \
+											renderTools.motionSamples(False)')
 								
 						
 						with frameLayout('Rendering'):
 							with columnLayout():
-								button(l='Load Render Settings for PathTracer',c='import commonTools; reload(commonTools); commonTools.loadRenderSettings("%s")' %pathTracerPreset,en=False)
-								button(l='Load Render Settings for Unified',c='import commonTools; reload(commonTools); commonTools.loadRenderSettings("%s")' %unifiedPreset,en=False)
+								button(l='Load Render Settings for PathTracer', \
+									c='import commonTools; \
+									reload(commonTools); \
+									commonTools.loadRenderSettings("%s")' %pathTracerPreset)
+								button(l='Load Render Settings for Unified', \
+									c='import commonTools; \
+									reload(commonTools); \
+									commonTools.loadRenderSettings("%s")' %unifiedPreset, \
+									en=False)
 
 						with frameLayout('Nomenclatures'):
 							with columnLayout():

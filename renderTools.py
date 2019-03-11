@@ -6,16 +6,16 @@ import commonTools,os
 
 # ****************************************** G L O B A L S ******************************************
 
-deltaAbc = ['propsBrevell','propsWerner','propsEthanHelmet','propsAltonHelmet']
+deltaAbc = ['propsBrevell','propsWerner','propsEthanHelmet','propsAltonHelmet','characterEthan']
 
 # ****************************************** F U N C T I O N S ******************************************
 
-def readCasting():
+def readCasting(*args):
 	'''This will read the cast file for the current shot and import'''
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	scenePath = scenePath.replace(os.sep, '/')
 	shotName = os.path.split(scenePath)[1]
-	castFile = scenePath+'/data/'+shotName+'.cast'
+	castFile = scenePath+'/data/'+shotName+'_setDress.cast'
 
 	# Load ATOM plugin
 	cmds.loadPlugin('atomImportExport.mll')
@@ -29,7 +29,7 @@ def readCasting():
 		return
 
 	# Test if atom file exists
-	atomFile = scenePath+'/data/'+shotName+'.atom'
+	atomFile = scenePath+'/data/'+shotName+'_setDress.atom'
 	if not os.path.isfile(atomFile):
 		cmds.warning('Atom file does not exist for this shot. Should be : '+atomFile)
 		return
@@ -59,20 +59,18 @@ def readCasting():
 	# Deduce file path and namespace
 	ctrls = []
 	for l in cast:
-		l = l.split('.ma')
-		asset = l[0]+'.ma'
-		import re
-		ns = os.path.split(l[0])[1]+re.sub('[^0-9]','',l[1])
+		asset,ns = l.split()
 
 		# Reference file
 		print('// Importing : '+asset+' with namespace : '+ns+' //')
 		cmds.file(asset,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=ns,returnNewNodes=True)
-		master = os.path.split(l[0])[1]
-		master = ns+':'+master+'_rig:'+master+'_master'
-		try :
-			cmds.parent(master,masterGrp)
-		except ValueError :
-			cmds.warning('Could not parent master : '+master)
+
+		# Group
+		# master = ns + '_master'
+		# try :
+		# 	cmds.parent(master,masterGrp)
+		# except ValueError :
+		# 	cmds.warning('Could not parent master : '+master)
 
 		# Apply ATOM transforms
 		ctrls.append(ns+':'+os.path.split(l[0])[1]+'_rig:'+os.path.split(l[0])[1]+'_ctrl')
@@ -155,7 +153,7 @@ def importShaders(*args):
 	for i in imported:
 		if i.startswith('props') == True:
 			assetType = 'props'
-		elif i.startsWith('character') == True:
+		elif i.startswith('character') == True:
 			assetType = 'character'
 		else :
 			cmds.warning('Could not resolve path for '+i)
@@ -216,3 +214,64 @@ def assignShaders(*args):
 					cmds.warning('Could not find matching Shading Group for '+i+', make sure your Shading Group name is : '+SG)
 	else :
 		cmds.warning('Could not find any object with ID')
+
+
+def importForest(*args):
+	'''This will import a generated RIB containing the instanced forest'''
+	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+	scenePath = scenePath.replace(os.sep, '/')
+	shotName = os.path.split(scenePath)[1]
+
+	ribFile = scenePath + '/geo/' + shotName + '_forest.rib'
+
+	if not os.path.exists(ribFile) :
+		cmds.warning('Could not find ' + ribFile)
+	else :
+		# Maya sucks so much that they included the import keyword in their command
+		mel.eval('file -import -type "RIB"  -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace "%s_forest"  -pr  -importTimeRange "combine" "%s";'%(shotName,ribFile))
+		cmds.group(shotName+'_forest',n='FOREST_GRP')
+
+
+# rename
+
+def autoBias(auto,*args): # Argument must be boolean
+	sel = cmds.ls(selection=True)
+	sel = cmds.listRelatives(shapes=True)
+	if auto == True :
+		for i in sel :
+			cmds.setAttr(i+'.rman_traceBias',0.01)
+			cmds.setAttr(i+'.rman_autoBias',-1)
+		cmds.inViewMessage(amg='Trace Bias set to Auto for %s objects' % (len(sel)), \
+			pos='midCenter',fade=True )
+	else :
+		for i in sel :
+			cmds.setAttr(i+'.rman_autoBias',0)
+			val = cmds.getAttr(i+'.rman_traceBias')
+			cmds.setAttr(i+'.rman_traceBias',val/10)
+			print(i+'.rman_traceBias   set to  '+str(val/10))
+		
+		cmds.inViewMessage( \
+			amg='Trace Bias divided by 10 for %s objects. Check script editor for values' % (len(sel)), \
+			pos='midCenter',fade=True )
+
+def motionSamples(inherit,*args): # Argument must be boolean
+	sel = cmds.ls(selection=True)
+	sel = cmds.listRelatives(shapes=True)
+	if inherit == True :
+		for i in sel :
+			cmds.setAttr(i+'.rman_motionSamples',-1)
+		cmds.inViewMessage(amg='Motion Samples set to inherit for %s objects' % (len(sel)), \
+			pos='midCenter',fade=True )
+	else :
+		
+		for i in sel :
+			val = cmds.getAttr(i+'.rman_motionSamples')
+			if val < 2 :
+				cmds.setAttr(i+'.rman_motionSamples',2)
+				val = 2
+			cmds.setAttr(i+'.rman_motionSamples',val+1)
+			print(i+'.rman_motionSamples   set to  '+str(val+1))
+		
+		cmds.inViewMessage( \
+			amg='Added one motion sample for %s objects. Check script editor for values' % (len(sel)), \
+			pos='midCenter',fade=True )

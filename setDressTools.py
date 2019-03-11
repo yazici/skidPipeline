@@ -53,7 +53,7 @@ def loadAllReferences():
 		print(i)
 		cmds.file(i,force=True,reference=True,loadReferenceDepth='all')
 
-def writeCasting():
+def writeCasting_bkp():
 	'''This will write a file containing all the file path of the reference assets for this shot
 	and their respective namespace'''
 
@@ -75,10 +75,12 @@ def writeCasting():
 	# 3. Merge duplicates
 	rn = list(dict.fromkeys(rn))
 	
-	# 4. Blast sets	
+	# 4. Blast sets	and alembic
 	for n in rn:
 		if not ':' in n :
 			rn.remove(n)
+
+
 
 	# 5. Keep only rig level references
 	for n in rn:
@@ -100,6 +102,58 @@ def writeCasting():
 	# # 10. cast file authoring
 	with open(castFile,'w') as f:
 		for i in rn :
+			namespace = str(i)
+			path = cmds.referenceQuery(i,filename=True,withoutCopyNumber=True)
+			f.write("%s %s\n" %(path,namespace))
+		f.close()
+
+	# 11. Inview message
+	print('\n// Result: '+castFile+' //')
+	cmds.inViewMessage( \
+		amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'_setDress.cast</hl>', \
+		pos='midCenter', \
+		fade=True)
+
+def writeCasting():
+	'''This will write a file containing all the file path of the reference assets for this shot
+	and their respective namespace'''
+
+	scenePath = cmds.workspace(sn=True,q=True)
+	scenePath = scenePath.replace(os.sep, '/')
+	sceneName = os.path.split(scenePath)[1]
+	castFile = scenePath+'/data/'+sceneName+'_setDress.cast'
+
+	# 1. Lister le contenu de SETDRESS_GRP
+	setDress  = cmds.listRelatives('SETDRESS_GRP',children=True)
+
+	# 2. Fetch topmost reference nodes
+	refNodes = []
+	for n in setDress:
+		try :
+			refNodes.append(cmds.referenceQuery(n,referenceNode=True))
+		except RuntimeError :
+			pass
+
+	# 3. If reference node is a set, fetch children and blast set
+	setsRN = [n for n in refNodes if n.startswith('set') and not n.startswith('setGleiten')]
+	for n in setsRN :
+		children = cmds.referenceQuery(n,referenceNode=True,child=True)
+		for child in children :
+			refNodes.append(child)
+		refNodes.remove(n)
+
+	# 9. if .cast file already exists : backup and delete
+	ts = datetime.datetime.now()
+	ts = '%s%s%s_%s%s%s'%(ts.year,ts.month,ts.day,ts.hour,ts.minute,ts.second)
+	backupFile = scenePath+'/data/backup/'+sceneName+'_'+ts+'.cast'	
+	
+	if os.path.isfile(castFile):
+		shutil.copyfile(castFile,backupFile)
+		os.remove(castFile)
+
+	# # 10. cast file authoring
+	with open(castFile,'w') as f:
+		for i in refNodes :
 			namespace = str(i)
 			path = cmds.referenceQuery(i,filename=True,withoutCopyNumber=True)
 			f.write("%s %s\n" %(path,namespace))
